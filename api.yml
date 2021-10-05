@@ -1,0 +1,1357 @@
+openapi: 3.0.1
+info:
+  title: Voirsy
+  description: ''
+  version: 1.0.0
+tags:
+- name: auth
+- name: salons
+- name: profile
+- name: bussiness
+paths: 
+# ##################### LOGIN #####################
+  /auth/checkemail:
+    post:
+      summary: Check if an email exists in a database
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  email: 
+                    type: string
+                    format: email
+                    example: john@gmail.com
+      responses:
+        200:
+          description: Correct request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  email: 
+                    type: string
+                    format: email
+                    example: john@gmail.com
+                  exist:
+                    type: boolean
+                    example: true
+        400:
+          $ref: '#/components/responses/400'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidEmailError'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SIGN IN #####################
+  /auth/signin:
+    post:
+      summary: Sign in to Voirsy
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  email: 
+                    type: string
+                    format: string
+                    example: john@gmail.com
+                  password: 
+                    type: string
+                    format: password
+                    example: qwerty123
+      responses:
+        200:
+          description: successfully logged in
+          content: 
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      role: 
+                        type: string
+                        enum: [standard, bussiness]
+                      language: 
+                        type: string
+                        example: en
+                      currency:
+                        type: string
+                        example: USD
+        400:
+          $ref: '#/components/responses/400'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  message: 
+                    type: string
+                    example: invalid user or password
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SIGN UP #####################
+  /auth/signup:
+    post:
+      summary: Sign up to Voirsy
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      role: 
+                        type: string
+                        enum: [bussiness, standard]
+                        example: standard
+                      password:
+                        type: string
+                        example: qwerty123
+      responses:
+        200:
+          description: successfully logged in
+          content: 
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                      role: 
+                        type: string
+                        enum: [standard, bussiness]
+                      language: 
+                        type: string
+                        example: en
+                      currency:
+                        type: string
+                        example: USD
+        400:
+          $ref: '#/components/responses/400'
+        405:
+          $ref: '#/components/responses/405_Email'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH THE SALONS #####################
+  /salons:
+    post:
+      summary: Fetch all salons
+      tags:
+      - salons
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  location: 
+                    type: string
+                    example: warsaw
+                  search: 
+                    type: string
+                    example: bar
+                  sortBy: 
+                    type: string
+                    enum: [topRated, quantityOfRatings]
+                    example: topRated
+                  currentPage:
+                    type: number
+                    example: 1
+      responses:
+        200:
+          description: Data successfully fetched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Salon2'
+                  
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH THE SALONS COORDINATES ##################### 
+  /salons/coordinates:
+    get:
+      summary: Fetch all salons coordinates
+      tags:
+      - salons
+      responses:
+        200:
+          description: Coordinates successfully fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  salonId: 
+                    type: string
+                    example: 60ae96dad2396a054c3ab53e
+                  coordinates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        latitude: 
+                          type: string
+                          example: 53.2734
+                        longitude:
+                          type: string
+                          example: -7.77832031
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH THE INFORMATION ABOUT SALON #####################
+  /salons/{salonId}/information:
+    get:
+      summary: Fetch a details about the specified salon
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      responses:
+        200:
+          description: Data successfully fetched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Salon2'
+                  - type: object
+                    properties:
+                      about: 
+                        type: string
+                        example: Barber Shop Warszawa - profesjonalny salon strzyżenia i stylizacji męskiego zarostu i fryzur. Wyjątkowa atmosfera, wykwalifikowani barberzy i jakość na najwyższym poziomie. Prowadzimy także sprzedaż kosmetyków i akcesoriów do pielęgnacji i stylizacji męskiego zarostu i włosów.
+                      contact: 
+                        type: string
+                        example: 639396013
+                  - type: object
+                    properties:
+                      services:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/ID'
+                            - $ref: '#/components/schemas/Service'
+                  - type: object
+                    properties:
+                      crew:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/ID'
+                            - $ref: '#/components/schemas/CrewMember'
+                            - type: object 
+                              properties:
+                                imageUrl: 
+                                  type: string
+                                  example: https://img.wprost.pl/img/zaklad-fryzjerski/a2/1e/8xxa956d098bfc33505d06700521.jpeg
+                  - type: object
+                    properties:
+                      openingHours:
+                        type: array
+                        items:
+                          type: object
+                          properties: 
+                            name: 
+                              type: string
+                              example: monday
+                            open:
+                              type: string
+                              example: 9:00
+                            close:
+                              type: string
+                              example: 21:00
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          description: Salon not found
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH THE REVIEWS ABOUT SALON #####################
+  /salons/{salonId}/reviews:
+    get:
+      summary: Fetch a reviews about the specified salon
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      responses:
+        200:
+          description: Data successfully fetched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - type: object
+                    properties:
+                      name: 
+                        type: string
+                        example: Barber Shop Warszawa
+                      address: 
+                        type: string
+                        example: Złota 73, 00-819, Warszawa, Wola
+                      reviews:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name: 
+                              type: string
+                              example: Sophia
+                            date: 
+                              type: string
+                              example: 21-10-03T17:08
+                            rating:
+                              type: number
+                              example: 4
+                            description:
+                              type: string
+                              example: Lorem ipsum lorem ipsum
+                            avatarUrl: 
+                              type: string
+                              example: https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          description: Salon not found
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH THE SALON PORTFOLIO #####################
+  /salons/{salonId}/portfolio:
+    get:
+      summary: Fetch a portfolio of the specified salon
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      responses:
+        200:
+          description: Data successfully fetched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - type: object
+                    properties:
+                      name: 
+                        type: string
+                        example: Barber Shop Warszawa
+                      address: 
+                        type: string
+                        example: Złota 73, 00-819, Warszawa, Wola
+                      images:
+                        type: array
+                        items:
+                          type: array
+                          items: 
+                            type: string
+                            example: https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          description: Salon not found
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FREE HOURS #####################
+  /salons/{salonId}/freehours:
+    post:
+      summary: Check if the service is available within the time range
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  salonId: 
+                    type: string
+                    example: 60ae96dad2396a054c3ab53e
+                  serviceId: 
+                    type: string
+                    example: 60ae96dad2396a054c3ab53e
+                  date:
+                    type: string
+                    format: date-time
+                    example: 1997-03-12T00:00:00Z
+                  timeRange:
+                    type: object
+                    properties: 
+                      start: 
+                        type: string
+                        example: 10:00
+                      end:
+                        type: string
+                        example: 11:00
+      responses:
+        200:
+          description: successfully reserved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: free hours returned
+                  freeHours: 
+                    type: array
+                    items:
+                      type: object
+                      properties: 
+                        workerId: 
+                          type: string
+                          example: 60ae96dad2396a054c3ab53e
+                        startHours: 
+                          type: array
+                          items:
+                            type: string
+                            example: 1997-03-12T10:30:00.000Z
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  errors: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        date: 
+                          type: string
+                          example: 'invalid date'
+                  message: 
+                    type: string
+                    example: validation error
+        500:
+          $ref: '#/components/responses/500'
+# ##################### RESERVATION #####################
+  /salons/{salonId}/reservation:
+    post:
+      summary: Book the service within the time range
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  salonId: 
+                    type: string
+                    example: 60ae96dad2396a054c3ab53e
+                  serviceId: 
+                    type: string
+                    example: 60ae96dad2396a054c3ab53e
+                  date:
+                    type: string
+                    format: date-time
+                    example: 1997-03-12T00:00:00Z
+                  hours:
+                    type: string
+                    example: 10:15
+      responses:
+        200:
+          description: successfully reserved
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  errors: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        date: 
+                          type: string
+                          example: 'invalid date'
+                  message: 
+                    type: string
+                    example: validation error
+        500:
+          $ref: '#/components/responses/500'
+# ##################### PROFILE #####################
+  /profile:
+    patch:
+      summary: Update the user's account
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref:  '#/components/schemas/User'
+      responses:
+        200:
+          description: User profile successfully updated
+          content:
+            application/json:
+                schema:
+                  allOf:
+                    - $ref:  '#/components/schemas/ID'
+                    - $ref:  '#/components/schemas/User'
+                    - type: object
+                      properties:
+                        avatarUrl:
+                          type: string
+                          example: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.forbes.com%2Fpower-women%2F&psig=AOvVaw37wmC_T4mDGs33Y0dgUJUh&ust=1633541462455000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCPCEranms_MCFQAAAAAdAAAAABAD
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidEmailError'
+        500:
+          description: Internal server 
+    delete:
+      summary: Delete the user's account
+      tags:
+      - profile
+      responses:
+        200:
+          description: Account successfully deleted
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    post:
+      summary: Change the user's password
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  oldPassword: 
+                    type: string
+                    example: qwerty123
+                  newPassword: 
+                    type: string
+                    example: 321ytrewq
+      responses:
+        200:
+          description: successfully updated
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'          
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  errors: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        oldPassword: 
+                          type: string
+                          example: 'invalid password'
+                  message: 
+                    type: string
+                    example: validation error
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FAVORITES #####################
+  /profile/favorites:
+    get:
+      summary: Fetch user's favorite salons
+      tags:
+      - profile
+      responses:
+        200:
+          description: User's favorite salons successfully fetched
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties: 
+                    favorites:
+                      type: array
+                      items: 
+                        example: ['615b24eac9fac70ee4d58b8e']
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          description: Internal server 
+    delete:
+      summary: Delete salon from user's favorite 
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties: 
+                  salonId: 
+                    type: string
+                    example: 615b24eac9fac70ee4d58b8e
+      responses:
+        200:
+          description: Salon successfully deleted from user's favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  salonId: 
+                    type: string
+                    example: 615b24eac9fac70ee4d58b8e
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    post:
+      summary: Add salon to user's favorite 
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                salonId: 
+                  type: string
+                  example: 615b24eac9fac70ee4d58b8e
+      responses:
+        200:
+          description: Salon successfully added to user's favorites
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'          
+        500:
+          $ref: '#/components/responses/500'
+# ##################### ALL USER SALONS #####################
+  /bussiness/salons:
+    get:
+      summary: Fetch a list of all user's salons
+      tags:
+      - bussiness
+      responses:
+        200:
+          description: successfully fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  salons:
+                    type: array
+                    items:
+                      allOf:
+                      - $ref: '#/components/schemas/Salon'
+                  firstSalon:
+                    allOf:
+                    - $ref: '#/components/schemas/Salon'
+                    - $ref: '#/components/schemas/SalonData'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SALON INFO #####################
+  /bussiness/${salonId}/info:
+    get:
+      summary: Fetch a info about a specified salon
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      responses:
+        200:
+          description: Info successfully fetched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Salon'
+                  - $ref: '#/components/schemas/SalonData'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SALON SCHEDULE #####################
+  /bussiness/${salonId}/schedule:
+    get:
+      summary: Fetch a schedule of a specified salon
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      responses:
+        200:
+          description: Schedule successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SALON PORTFOLIO #####################
+  /bussiness/${salonId}/portfolio:
+    get:
+      summary: Fetch a portfolio of a specified salon
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      responses:
+        200:
+          description: Portfolio successfully fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  type: string
+                  example: [https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80, 
+                            https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80]                
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### DELETE SALON #####################
+  /bussiness/${salonId}:
+    delete:
+      summary: Delete a salon
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ID'
+      responses:
+        200:
+          description: Salon successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SERVICES #####################
+  /bussiness/${salonId}/service:
+    post:
+      summary: Create a new service
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: Service successfully created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      summary: Update an existing service properties
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: Service successfully updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+    delete: 
+      summary: Remove a service with a specified `_id`
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ID'
+      responses:
+        200:
+          description: Service successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### CREW MEMBERS #####################
+  /bussiness/${salonId}/crew:
+    post:
+      summary: Add a new crew member to selected salon
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties:
+                  name: 
+                    type: string
+                    example: Jessica
+      responses:
+        200:
+          description: Crew member successfully added
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/CrewMember'
+                  - type: object
+                    properties:
+                      imageUrl: 
+                        type: string
+                        example: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posters.pl%2Fplakaty%2Fwonder-woman-1984-solo-v71309&psig=AOvVaw0QhSrhK0_ScvO-vyctD_45&ust=1633533226212000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCKiLqNLHs_MCFQAAAAAdAAAAABAD
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      summary: Edit an existing crew member properties
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/CrewMember'
+      responses:
+        200:
+          description: Crew member successfully updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/CrewMember'
+                  - type: object
+                    properties:                      
+                      imageUrl: 
+                        type: string
+                        example: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posters.pl%2Fplakaty%2Fwonder-woman-1984-solo-v71309&psig=AOvVaw0QhSrhK0_ScvO-vyctD_45&ust=1633533226212000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCKiLqNLHs_MCFQAAAAAdAAAAABAD
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+    delete: 
+      summary: Remove a crew member with a specified `_id`
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ID'
+      responses:
+        200:
+          description: Crew member successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SALON #####################
+  /bussiness/${salonId}/salon:
+    patch:
+      summary: Edit an existing salon properties
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Salon'
+      responses:
+        200:
+          description: Data successfully updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Salon'
+                    required:
+                    - name
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+    delete: 
+      summary: Remove a salon with a specified `_id`
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ID'
+      responses:
+        200:
+          description: Salon successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### CREATE SALON #####################
+  /bussiness/salon:
+    post:
+      summary: Create a new salon
+      tags:
+      - bussiness
+      requestBody:
+        content:
+          application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Salon'
+                  - type: object
+                    properties:
+                      email: 
+                        type: string
+                        format: email
+                        example: john@gmail.com
+                      category:
+                        type: string
+                        enum:
+                          - hairdressers
+                          - tattooArtists
+                          - beauticians
+                          - barbers
+                      services: 
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/ID'
+                            - $ref: '#/components/schemas/Service'
+                      crew: 
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/ID'
+                            - $ref: '#/components/schemas/CrewMember'
+                        
+      responses:
+        200:
+          description: Salon successfully added
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Salon'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        405:
+          $ref: '#/components/responses/405_Name'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### COMPONENTS #####################
+components:
+  schemas:
+    ID:
+      type: object
+      required:
+        - _id
+      properties:
+        _id: 
+          type: string
+          example: 615b24eac9fac70ee4d58b8e
+    Salon:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Barber Shop Warszawa
+          minLength: 5
+          maxLength: 50
+        address: 
+          type: string
+          example: Złota 73, 00-819, Warszawa, Wola
+          minLength: 5
+          maxLength: 75
+        phone: 
+          type: string
+          example: 893780321
+          minLength: 9
+          maxLength: 9
+        description:
+          type: string
+          example: Barber Shop Warszawa - profesjonalny salon strzyżenia i stylizacji męskiego zarostu i fryzur. Wyjątkowa atmosfera, wykwalifikowani barberzy i jakość na najwyższym poziomie. Prowadzimy także sprzedaż kosmetyków i akcesoriów do pielęgnacji i stylizacji męskiego zarostu i włosów.
+          maxLength: 200
+    Salon2:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Barber Shop Warszawa
+          minLength: 5
+          maxLength: 50
+        address: 
+          type: string
+          example: Złota 73, 00-819, Warszawa, Wola
+          minLength: 5
+          maxLength: 75
+        imageUrl:
+          type: string
+          example: https://img.wprost.pl/img/zaklad-fryzjerski/a2/1e/8xxa956d098bfc33505d06700521.jpeg
+        rating:
+          type: number
+          format: float
+          example: 4.27    
+    CrewMember:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Jessica
+          minLength: 3
+          maxLength: 50
+    Service:
+      type: object
+      properties: 
+        name: 
+          type: string
+          example: Trwała ondulacja
+          minLength: 5
+        price: 
+          type: number
+          format: float
+          example: 42.80
+          description: Price of the service Dolars
+        duration: 
+          type: integer
+          example: 80
+          minimum: 15
+          multipleOf: 15
+          description: Duration of the service minutes
+        description:
+          type: string
+          example: Najnowszy trend w męskich fryzurach.
+    User:
+      type: object
+      properties: 
+        email: 
+          type: string
+          format: email
+          example: john@gmail.com
+        fullname: 
+          type: string
+          example: John Doe
+          minLength: 3
+          maxLength: 50
+        birthdate:
+          type: string
+          format: date-time
+          example: 1997-03-12T00:00:00Z
+        phone: 
+          type: string
+          example: 893780321
+          minLength: 9
+          maxLength: 9
+    InvalidNameError:
+      type: object
+      properties: 
+        errors: 
+          type: array
+          items: 
+            type: object
+            properties:
+              name: 
+                type: string
+                example: 'invalid name'
+        message: 
+          type: string
+          example: validation error
+    InvalidEmailError:
+      type: object
+      properties: 
+        errors: 
+          type: array
+          items: 
+            type: object
+            properties:
+              email: 
+                type: string
+                example: 'invalid email'
+        message: 
+          type: string
+          example: validation error
+    Schedule:
+      type: object
+      properties:
+        time: 
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        clientName: 
+          type: string
+          example: John Doe
+        phone: 
+          type: string
+          example: 893780321
+          minLength: 9
+          maxLength: 9
+    SalonData:
+      type: object
+      properties:
+        salon:
+          type: object
+          properties:
+            crew:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/CrewMember'
+                  - type: object
+                    properties:
+                      imageUrl: 
+                        type: string
+                        example: https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80
+            services:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Service'
+  parameters:
+    SalonId:
+      name: salonId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: ID of the salon
+  responses:
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    403:
+      description: Operation forbidden
+    405_Name:
+      description: Validation exception
+      content: 
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvalidNameError'
+    405_Email:
+      description: Validation exception
+      content: 
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvalidEmailError'
+    500:
+      description: Unknown server error
