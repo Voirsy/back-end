@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const mongoose = require('mongoose')
 
@@ -34,7 +36,7 @@ app.use((error, req, res, next) => {
     })
 })
 
-mongoose.connect('mongodb+srv://studiesUser:r6MsmhxSbo5yRgPF@studies.f2jst.mongodb.net/voirsy?retryWrites=true&w=majority')
+mongoose.connect(process.env.DB_CONNECT)
 .then(result => {
     app.listen(port)
 })

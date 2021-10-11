@@ -92,7 +92,7 @@ exports.signIn = async (req, res, next) => {
             email: loadedUser.email,
             userId: loadedUser._id.toString(),
             role: loadedUser.role
-        }, 'uniwersytetkazimierzawielkiegowbydgoszczy', {
+        }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         })
         
