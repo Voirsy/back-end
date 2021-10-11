@@ -1,5 +1,8 @@
 const User = require('../models/user')
 
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
 exports.checkEmail = async (req, res, next) => {
     try {
         const email = req.body.email
@@ -77,7 +80,7 @@ exports.signIn = async (req, res, next) => {
             throw error
         }
         
-        const isEqual = bcrypt.compare(password, user.password)
+        const isEqual = bcrypt.compare(password, loadedUser.password)
             
         if(!isEqual) {
             const error = new Error('wrong password')
