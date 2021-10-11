@@ -26,6 +26,14 @@ const userSchema = new Schema({
         type: String,
         required: true,
         enum: ['bussiness', 'standard']
+    },
+    language: {
+        type: String,
+        required: true
+    },
+    currency: {
+        type: String,
+        required: true
     }
 })
 
