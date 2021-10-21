@@ -8,9 +8,10 @@ exports.checkEmail = async (req, res, next) => {
         const email = req.body.email
         const emailExist = await User.findOne({email: email})
         if(!emailExist) {
-            const error = new Error('email not exists in database')
-            error.statusCode = 404
-            throw error
+            res.status(404).json({
+                email: email,
+                exist: false
+            })
         }
 
         res.status(200).json({
