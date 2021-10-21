@@ -7,16 +7,15 @@ exports.checkEmail = async (req, res, next) => {
     try {
         const email = req.body.email
         const emailExist = await User.findOne({email: email})
+
+        let exist = true
         if(!emailExist) {
-            res.status(404).json({
-                email: email,
-                exist: false
-            })
+            exist = false
         }
 
         res.status(200).json({
             email: email,
-            exist: true
+            exist: exist
         })
     } catch (e) {
         next(e)
