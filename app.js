@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 
 const authRoutes = require('./routes/auth')
 const bussinessRoutes = require('./routes/bussiness')
+const salonsRoutes = require('./routes/salons')
 
 const port = process.env.PORT || 8080
 const app = express()
@@ -18,7 +19,8 @@ app.use(express.urlencoded({
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 app.use('/auth', authRoutes)
-app.use('/bussiness', bussinessRoutes);
+app.use('/bussiness', bussinessRoutes)
+app.use('/salons', salonsRoutes)
 
 app.use((error, req, res, next) => {
     console.log(error)
