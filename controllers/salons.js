@@ -54,11 +54,7 @@ exports.freeHours = async (req, res, next) => {
                 let freeTime = []
                 for(let i = 0; i <= worker.schedule.length; i++) {
                     
-                    let end = worker.schedule.length > i ? moment(worker.schedule[i].start) : rangeEnd
-                    
-                    console.log('====' + i)
-                    console.log(start)
-                    console.log(end)
+                    let end = worker.schedule.length > i ? moment(worker.schedule[i].start) : rangeEnd.add(duration, 'minutes')
                     
                     if (end.diff(start, 'minutes') >= duration) {
                         let range = moment.range(start, end.subtract(duration, 'minutes'))
@@ -72,25 +68,7 @@ exports.freeHours = async (req, res, next) => {
                     freeTime: freeTime
                 }) 
             }
-            //if(moment(worker.schedule[0].start).diff(start, 'minutes') >= duration) freeHours.push(worker.schedule[0].start)
         })
-        
-        // let freeHours = []
-        // crew.forEach(worker => {
-        //     for(let i = 0; i < worker.schedule.length - 1; i++) {
-        //         if(moment(worker.schedule[i].start).isSame(moment(timeRange.day), 'day')) {
-        //             const nextTaskStart = moment(worker.schedule[i + 1].start)
-        //             let taskStart = moment(worker.schedule[i].end)
-        //             while (nextTaskStart.diff(taskStart, 'minutes') >= timeRange.duration) {
-        //                 freeHours.push({
-        //                     workerId: worker.workerId,
-        //                     start: taskStart
-        //                 })
-        //                 taskStart = moment(taskStart).add(15, 'm').toDate()
-        //             }
-        //         }
-        //     }
-        // })
 
         res.status(200).json({
             message: 'new salon created',
