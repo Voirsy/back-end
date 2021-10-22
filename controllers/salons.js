@@ -45,7 +45,6 @@ exports.freeHours = async (req, res, next) => {
         let freeHours = []
         rangeEnd.subtract(duration, 'minutes')
         mappedCrew.forEach(worker => {
-            console.log(worker)
             if(!worker.schedule.length) {
                 let range = moment.range(rangeStart, rangeEnd)
                 freeHours.push({
