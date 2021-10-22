@@ -47,7 +47,7 @@ exports.freeHours = async (req, res, next) => {
                 let range = moment.range(rangeStart, rangeEnd)
                 freeHours.push({
                     workerId: worker.id,
-                    freeTime: Array.from(range.by('minutes', {step: 15}))
+                    startHours: Array.from(range.by('minutes', {step: 15}))
                 }) 
             } else {
                 let start = rangeStart
@@ -65,7 +65,7 @@ exports.freeHours = async (req, res, next) => {
                 }
                 freeHours.push({
                     workerId: worker.id,
-                    freeTime: freeTime
+                    startHours: freeTime
                 }) 
             }
         })
