@@ -34,6 +34,8 @@ exports.freeHours = async (req, res, next) => {
                 return true
             })
 
+            filteredSchedule.sort((a, b) => ( moment(a.start).isAfter(moment(b.start)) ) ? 1 : (moment(b.start).isAfter(moment(a.start))) ? -1 : 0)
+
             return {
                 id: worker._id,
                 schedule: filteredSchedule
@@ -43,6 +45,7 @@ exports.freeHours = async (req, res, next) => {
         let freeHours = []
         rangeEnd.subtract(duration, 'minutes')
         mappedCrew.forEach(worker => {
+            console.log(worker)
             if(!worker.schedule.length) {
                 let range = moment.range(rangeStart, rangeEnd)
                 freeHours.push({
