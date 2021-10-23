@@ -8,15 +8,9 @@ const Salon = require('../models/salon')
 exports.freeHours = async (req, res, next) => {
     try {
         const salonId = req.body.salonId
+        const serviceId = req.body.serviceId
         const rangeStart = moment(req.body.timeRange.start).utc()
         const rangeEnd = moment(req.body.timeRange.end).utc()
-        const duration = req.body.timeRange.duration
-
-        if(rangeEnd.diff(rangeStart, 'minutes') < duration) {
-            const error = new Error('range is too short for selected service')
-            error.statusCode = 500
-            throw error
-        }
 
         const salon = await Salon.findOne({_id: salonId})
         if(!salon) {
@@ -33,8 +27,31 @@ exports.freeHours = async (req, res, next) => {
             return day.name.toLowerCase() === rangeEnd.format('dddd').toLowerCase()
         })
 
+        if(!startDayOfWeek || !endDayOfWeek) {
+            const error = new Error('salon is close in selected day')
+            error.statusCode = 500
+            throw error
+        }
+
         if((rangeStart.format("hh:mm") < startDayOfWeek.open) || (rangeEnd.format("hh:mm") > endDayOfWeek.open)) {
             const error = new Error('salon is close in selected range')
+            error.statusCode = 500
+            throw error
+        }
+
+        const [ service ] = salon.services.filter(service => {
+            return service._id.toString() === serviceId
+        })
+
+        if(!service) {
+            const error = new Error('selected service not exists')
+            error.statusCode = 500
+            throw error
+        }
+
+        const duration = service.duration
+        if(rangeEnd.diff(rangeStart, 'minutes') < duration) {
+            const error = new Error('range is too short for selected service')
             error.statusCode = 500
             throw error
         }
@@ -87,7 +104,7 @@ exports.freeHours = async (req, res, next) => {
         })
 
         res.status(200).json({
-            message: 'new salon created',
+            message: 'free hours returned',
             freeHours: freeHours
         })
     }
