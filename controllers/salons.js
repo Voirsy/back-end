@@ -8,12 +8,12 @@ const Salon = require('../models/salon')
 exports.freeHours = async (req, res, next) => {
     try {
         const salonId = req.body.salonId
-        const rangeStart = moment(req.body.timeRange.start)
-        const rangeEnd = moment(req.body.timeRange.end)
+        const rangeStart = moment(req.body.timeRange.start).utc()
+        const rangeEnd = moment(req.body.timeRange.end).utc()
         const duration = req.body.timeRange.duration
 
         if(rangeEnd.diff(rangeStart, 'minutes') < duration) {
-            const error = new Error('selected range is too short')
+            const error = new Error('range is too short for selected service')
             error.statusCode = 500
             throw error
         }
@@ -25,10 +25,24 @@ exports.freeHours = async (req, res, next) => {
             throw error
         }
 
+        const [ startDayOfWeek ] = salon.openingHours.filter(day => {
+            return day.name.toLowerCase() === rangeStart.format('dddd').toLowerCase()
+        })
+
+        const [ endDayOfWeek ] = salon.openingHours.filter(day => {
+            return day.name.toLowerCase() === rangeEnd.format('dddd').toLowerCase()
+        })
+
+        if((rangeStart.format("hh:mm") < startDayOfWeek.open) || (rangeEnd.format("hh:mm") > endDayOfWeek.open)) {
+            const error = new Error('salon is close in selected range')
+            error.statusCode = 500
+            throw error
+        }
+
         const mappedCrew = salon.crew.map(worker => {
             const filteredSchedule = worker.schedule.filter((task) => {
-                let taskStart = moment(task.start)
-                let taskEnd = moment(task.end)
+                let taskStart = moment(task.start).utc()
+                let taskEnd = moment(task.end).utc()
 
                 if ( taskStart.isSameOrAfter(rangeEnd) || taskEnd.isSameOrBefore(rangeStart) ) return false
                 return true
@@ -56,14 +70,14 @@ exports.freeHours = async (req, res, next) => {
                 let freeTime = []
                 for(let i = 0; i <= worker.schedule.length; i++) {
                     
-                    let end = worker.schedule.length > i ? moment(worker.schedule[i].start) : rangeEnd.add(duration, 'minutes')
+                    let end = worker.schedule.length > i ? moment(worker.schedule[i].start).utc() : rangeEnd.add(duration, 'minutes')
                     
                     if (end.diff(start, 'minutes') >= duration) {
                         let range = moment.range(start, end.subtract(duration, 'minutes'))
                         freeTime = freeTime.concat(Array.from(range.by('minutes', {step: 15})))
                     }
                     
-                    if (i < worker.schedule.length) start = moment(worker.schedule[i].end)
+                    if (i < worker.schedule.length) start = moment(worker.schedule[i].end).utc()
                 }
                 freeHours.push({
                     workerId: worker.id,
