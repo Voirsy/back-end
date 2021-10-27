@@ -36,6 +36,8 @@ exports.signUp = async (req, res, next) => {
     const fullname = req.body.fullname;
     const birthdate = req.body.birthdate;
     const phone = req.body.phone;
+    const birthdate = null;
+    const phone = null;
     const role = req.body.role;
     const language = req.body.language;
     const currency = req.body.currency;
