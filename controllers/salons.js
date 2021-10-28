@@ -112,3 +112,65 @@ exports.freeHours = async (req, res, next) => {
         next(e)
     }
 }
+
+exports.confirmReservation = async (req, res, next) => {
+    try {
+        const salonId = req.body.salonId
+        const serviceId = req.body.serviceId
+        const workerId = req.body.workerId
+        const startHour = moment(req.body.startHour).utc()
+        const userId = req.body.customerId
+
+        const salon = await Salon.findOne({_id: salonId})
+        if(!salon) {
+            const error = new Error('selected salon not exists')
+            error.statusCode = 404
+            throw error
+        }
+
+        const [ service ] = salon.services.filter(service => {
+            return service._id.toString() === serviceId
+        })
+        if(!service) {
+            const error = new Error('selected service not exists')
+            error.statusCode = 500
+            throw error
+        }
+
+        const [ worker ] = salon.crew.filter(worker => {
+            return worker._id.toString() === workerId
+        })
+        if(!worker) {
+            const error = new Error('selected worker not exists')
+            error.statusCode = 500
+            throw error
+        }
+
+        const endHour = startHour.clone().add(service.duration, 'minutes')
+        const checkSchedule = worker.schedule.filter(task => {
+            if(endHour.isSameOrBefore(moment(task.start).utc()) || startHour.isSameOrAfter(moment(task.end).utc())) return false
+            else return true
+        })
+        if(checkSchedule.length > 0) {
+            const error = new Error('selected hour is no longer free')
+            error.statusCode = 500
+            throw error
+        }
+
+        worker.schedule.push({
+            customer: userId,
+            service: serviceId,
+            start: startHour,
+            end: endHour
+        })
+
+        const updatedSalon = await salon.save()
+
+        res.status(200).json({
+            message: 'successfully reserved'
+        })
+    }
+    catch (e) {
+        next(e)
+    }
+}
