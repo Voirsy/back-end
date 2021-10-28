@@ -33,7 +33,7 @@ exports.freeHours = async (req, res, next) => {
             throw error
         }
 
-        if((rangeStart.format("hh:mm") < startDayOfWeek.open) || (rangeEnd.format("hh:mm") > endDayOfWeek.open)) {
+        if((rangeStart.format("hh:mm") < startDayOfWeek.open || rangeStart.format("hh:mm") > startDayOfWeek.close) || (rangeEnd.format("hh:mm") > endDayOfWeek.close || rangeEnd.format("hh:mm") < endDayOfWeek.open)) {
             const error = new Error('salon is close in selected range')
             error.statusCode = 500
             throw error
