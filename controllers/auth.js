@@ -32,13 +32,13 @@ exports.signUp = async (req, res, next) => {
       throw error;
     }
 
-    const password = req.body.password;
+    const password = await bcrypt.hash(req.body.password, 10);
     const fullname = req.body.fullname;
-    const birthdate = req.body.birthdate;
-    const phone = req.body.phone;
+    const birthdate = null;
+    const phone = null;
     const role = req.body.role;
-    const language = req.body.language;
-    const currency = req.body.currency;
+    const language = "en";
+    const currency = "euro";
 
     const user = new User({
       email: email,
@@ -58,9 +58,31 @@ exports.signUp = async (req, res, next) => {
       throw error;
     }
 
+    const token = jwt.sign(
+      {
+        email: newUser.email,
+        userId: newUser._id.toString(),
+        role: newUser.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
     res.status(201).json({
       message: "new user created",
-      user: newUser,
+      token,
+      user: {
+        userId: newUser._id.toString(),
+        email,
+        fullname,
+        birthdate,
+        phone,
+        role,
+        language,
+        currency,
+      },
     });
   } catch (e) {
     next(e);
