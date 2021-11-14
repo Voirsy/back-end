@@ -721,12 +721,21 @@ paths:
                   salons:
                     type: array
                     items:
-                      allOf:
-                      - $ref: '#/components/schemas/Salon'
-                  firstSalon:
-                    allOf:
-                    - $ref: '#/components/schemas/Salon'
-                    - $ref: '#/components/schemas/SalonData'
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 615b24eac9fac70ee4d58b8e
+                        name: 
+                          type: string
+                          example: Barber Shop Warszawa
+                          minLength: 5
+                          maxLength: 50
+                        address: 
+                          type: string
+                          example: Złota 73, 00-819, Warszawa, Wola
+                          minLength: 5
+                          maxLength: 75
         400:
           $ref: '#/components/responses/400'
         401:
@@ -1253,8 +1262,7 @@ components:
           maxLength: 50
         birthdate:
           type: string
-          format: date-time
-          example: 1997-03-12T00:00:00Z
+          example: "1997-03-12T00:00:00Z"
         phone: 
           type: string
           example: 893780321
@@ -1293,8 +1301,7 @@ components:
       properties:
         time: 
           type: string
-          format: date-time
-          example: 2017-07-21T17:32:28Z
+          example: "1997-03-12T00:00:00Z"
         clientName: 
           type: string
           example: John Doe
