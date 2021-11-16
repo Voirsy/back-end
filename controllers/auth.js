@@ -139,3 +139,33 @@ exports.signIn = async (req, res, next) => {
     next(e);
   }
 };
+
+exports.getUserData = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const loadedUser = await User.findOne({ _id: userId });
+
+    if (!loadedUser) {
+      const error = new Error("user with that email not exists");
+      error.statusCode = 404;
+      throw error;
+    }
+    
+    res.status(200).json({
+      user: {
+        id: loadedUser._id.toString(),
+        email: loadedUser.email,
+        fullname: loadedUser.fullname,
+        birthdate: loadedUser.birthdate,
+        phone: loadedUser.phone,
+        role: loadedUser.role,
+        language: loadedUser.language,
+        currency: loadedUser.currency,
+      },
+    });
+    
+  } catch (e) {
+    next(e);
+  }
+};
