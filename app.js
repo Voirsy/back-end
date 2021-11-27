@@ -5,6 +5,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 
 const authRoutes = require('./routes/auth')
+const profileRoutes = require('./routes/profile')
 
 const port = process.env.PORT || 8080
 const app = express()
@@ -17,6 +18,7 @@ app.use(express.urlencoded({
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 app.use('/auth', authRoutes)
+app.use(profileRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error)
