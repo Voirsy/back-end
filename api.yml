@@ -8,7 +8,7 @@ tags:
 - name: salons
 - name: profile
 - name: bussiness
-paths: 
+paths:  
 # ##################### LOGIN #####################
   /auth/checkemail:
     post:
@@ -157,6 +157,58 @@ paths:
           $ref: '#/components/responses/405_Email'
         500:
           $ref: '#/components/responses/500'
+# ##################### FETCH ALL CITIES WHERE VOIRSY IS AVAILABLE ##################### 
+  /cities:
+    get:
+      summary: Fetch all cities where Voirsy is available
+      tags:
+      - location
+      responses:
+        200:
+          description: Cities successfully fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id: 
+                      type: string
+                      example: 60ae96dad2396a054c3ab53e
+                    name:
+                      type: string
+                      example: warsaw
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+# ##################### FETCH ALL AVAILABLE CATEGORIES ##################### 
+  /categories:
+    get:
+      summary: Fetch all available categories
+      tags:
+      - categories
+      responses:
+        200:
+          description: Categories successfully fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id: 
+                      type: string
+                      example: 60ae96dad2396a054c3ab53e
+                    name:
+                      type: string
+                      example: hairdressers
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
 # ##################### FETCH THE SALONS #####################
   /salons:
     post:
@@ -196,40 +248,8 @@ paths:
           $ref: '#/components/responses/400'
         500:
           $ref: '#/components/responses/500'
-# ##################### FETCH THE SALONS COORDINATES ##################### 
-  /salons/coordinates:
-    get:
-      summary: Fetch all salons coordinates
-      tags:
-      - salons
-      responses:
-        200:
-          description: Coordinates successfully fetched
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: 
-                  salonId: 
-                    type: string
-                    example: 60ae96dad2396a054c3ab53e
-                  coordinates:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        latitude: 
-                          type: string
-                          example: 53.2734
-                        longitude:
-                          type: string
-                          example: -7.77832031
-        400:
-          $ref: '#/components/responses/400'
-        500:
-          $ref: '#/components/responses/500'
 # ##################### FETCH THE INFORMATION ABOUT SALON #####################
-  /salons/{salonId}/information:
+  /salons/{salonId}:
     get:
       summary: Fetch a details about the specified salon
       tags:
@@ -291,29 +311,6 @@ paths:
                             close:
                               type: string
                               example: 21:00
-        400:
-          $ref: '#/components/responses/400'
-        404:
-          description: Salon not found
-        500:
-          $ref: '#/components/responses/500'
-# ##################### FETCH THE REVIEWS ABOUT SALON #####################
-  /salons/{salonId}/reviews:
-    get:
-      summary: Fetch a reviews about the specified salon
-      tags:
-      - salons
-      parameters:
-        - in: path
-          $ref: '#/components/parameters/SalonId'
-      responses:
-        200:
-          description: Data successfully fetched
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ID'
                   - type: object
                     properties:
                       name: 
@@ -342,29 +339,6 @@ paths:
                             avatarUrl: 
                               type: string
                               example: https://images.unsplash.com/photo-1509967419530-da38b4704bc6?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d29tYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80
-        400:
-          $ref: '#/components/responses/400'
-        404:
-          description: Salon not found
-        500:
-          $ref: '#/components/responses/500'
-# ##################### FETCH THE SALON PORTFOLIO #####################
-  /salons/{salonId}/portfolio:
-    get:
-      summary: Fetch a portfolio of the specified salon
-      tags:
-      - salons
-      parameters:
-        - in: path
-          $ref: '#/components/parameters/SalonId'
-      responses:
-        200:
-          description: Data successfully fetched
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ID'
                   - type: object
                     properties:
                       name: 
@@ -1129,11 +1103,7 @@ paths:
                         example: john@gmail.com
                       category:
                         type: string
-                        enum:
-                          - hairdressers
-                          - tattooArtists
-                          - beauticians
-                          - barbers
+                        example: 615b24eac9fac70ee4d58b8e
                       services: 
                         type: array
                         items:
@@ -1187,9 +1157,12 @@ components:
           maxLength: 50
         address: 
           type: string
-          example: Złota 73, 00-819, Warszawa, Wola
+          example: Złota 73, 00-819
           minLength: 5
           maxLength: 75
+        cityId:
+          type: string
+          example: 615b24eac9fac70ee4d58b8e
         phone: 
           type: string
           example: 893780321
@@ -1209,9 +1182,12 @@ components:
           maxLength: 50
         address: 
           type: string
-          example: Złota 73, 00-819, Warszawa, Wola
+          example: Złota 73, 00-819
           minLength: 5
           maxLength: 75
+        city:
+          type: string
+          example: warsaw
         imageUrl:
           type: string
           example: https://img.wprost.pl/img/zaklad-fryzjerski/a2/1e/8xxa956d098bfc33505d06700521.jpeg
