@@ -29,13 +29,13 @@ exports.freeHours = async (req, res, next) => {
 
         if(!startDayOfWeek || !endDayOfWeek) {
             const error = new Error('salon is close in selected day')
-            error.statusCode = 500
+            error.statusCode = 406
             throw error
         }
 
         if((rangeStart.format("HH:mm") < startDayOfWeek.open || rangeStart.format("HH:mm") > startDayOfWeek.close) || (rangeEnd.format("HH:mm") > endDayOfWeek.close || rangeEnd.format("HH:mm") < endDayOfWeek.open)) {
             const error = new Error('salon is close in selected range')
-            error.statusCode = 500
+            error.statusCode = 406
             throw error
         }
 
@@ -45,14 +45,14 @@ exports.freeHours = async (req, res, next) => {
 
         if(!service) {
             const error = new Error('selected service not exists')
-            error.statusCode = 500
+            error.statusCode = 404
             throw error
         }
 
         const duration = service.duration
         if(rangeEnd.diff(rangeStart, 'minutes') < duration) {
             const error = new Error('range is too short for selected service')
-            error.statusCode = 500
+            error.statusCode = 406
             throw error
         }
 
@@ -133,7 +133,7 @@ exports.confirmReservation = async (req, res, next) => {
         })
         if(!service) {
             const error = new Error('selected service not exists')
-            error.statusCode = 500
+            error.statusCode = 404
             throw error
         }
 
@@ -142,7 +142,7 @@ exports.confirmReservation = async (req, res, next) => {
         })
         if(!worker) {
             const error = new Error('selected worker not exists')
-            error.statusCode = 500
+            error.statusCode = 404
             throw error
         }
 
@@ -153,7 +153,7 @@ exports.confirmReservation = async (req, res, next) => {
         })
         if(checkSchedule.length > 0) {
             const error = new Error('selected hour is no longer free')
-            error.statusCode = 500
+            error.statusCode = 406
             throw error
         }
 

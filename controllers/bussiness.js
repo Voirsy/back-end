@@ -25,11 +25,11 @@ exports.createSalon = async (req, res, next) => {
         const newSalon = await salon.save()
         if(!newSalon) {
             const error = new Error('creating new salon failed')
-            error.statusCode = 403
+            error.statusCode = 400
             throw error
         }
 
-        res.status(200).json({
+        res.status(201).json({
             message: 'new salon created',
             salon: newSalon
         })
