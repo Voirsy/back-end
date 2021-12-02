@@ -10,10 +10,10 @@ const salonSchema = new Schema({
         type: String,
         required: true
     },
-    category: {
+    type: {
         type: String,
         required: true,
-        enum: ['hairdressers']
+        enum: ['hairdresser', 'barber', 'beautician', 'tatooist']
     },
     contact: {
         phone: {
@@ -29,7 +29,11 @@ const salonSchema = new Schema({
         type: String,
         required: false
     },
-    about: {
+    city: {
+        type: String,
+        required: true
+    }
+    description: {
         type: String,
         required: false
     },

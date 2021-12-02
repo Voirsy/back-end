@@ -5,8 +5,9 @@ exports.createSalon = async (req, res, next) => {
         const name = req.body.name
         const address = req.body.address
         const contact = req.body.contact
-        const about = req.body.about
-        const category = req.body.category
+        const description = req.body.description
+        const type = req.body.type
+        const city = req.body.type
         const services = req.body.services
         const crew = req.body.crew
         const openingHours = req.body.openingHours
@@ -15,8 +16,9 @@ exports.createSalon = async (req, res, next) => {
             name: name,
             address: address,
             contact: contact,
-            about: about,
-            category: category,
+            description: description,
+            type: type,
+            city: city,
             services: services,
             crew: crew,
             openingHours: openingHours
