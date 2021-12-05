@@ -32,7 +32,7 @@ const salonSchema = new Schema({
     city: {
         type: String,
         required: true
-    }
+    },
     description: {
         type: String,
         required: false
