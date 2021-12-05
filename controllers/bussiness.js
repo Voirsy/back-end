@@ -2,6 +2,16 @@ const Salon = require('../models/salon')
 
 exports.createSalon = async (req, res, next) => {
     try {
+        const isAuth = req.isAuth
+        const userId = req.userId;
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const owner = userId
         const name = req.body.name
         const address = req.body.address
         const contact = req.body.contact
@@ -13,6 +23,7 @@ exports.createSalon = async (req, res, next) => {
         const openingHours = req.body.openingHours
 
         const salon = new Salon({
+            owner: owner,
             name: name,
             address: address,
             contact: contact,
