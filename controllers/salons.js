@@ -115,11 +115,19 @@ exports.freeHours = async (req, res, next) => {
 
 exports.confirmReservation = async (req, res, next) => {
     try {
+        const isAuth = req.isAuth
+        const userId = req.userId;
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
         const salonId = req.body.salonId
         const serviceId = req.body.serviceId
         const workerId = req.body.workerId
         const startHour = moment(req.body.startHour).utc()
-        const userId = req.body.customerId
 
         const salon = await Salon.findOne({_id: salonId})
         if(!salon) {
