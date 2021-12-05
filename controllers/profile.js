@@ -89,10 +89,11 @@ exports.updateProfile = async (req, res, next) => {
           throw error;
       }
 
-      if(user.email !== req.body.email) {
-          const emailExist = await User.findOne({ email: email });
-          if (emailExist) {
-              const error = new Error("email already exists in database");
+      const email = req.user.email;
+      if(email && (user.email !== email)) {
+          const alreadyExist = await User.findOne({ email: email });
+          if (alreadyExist) {
+              const error = new Error("your new email already exists in database");
               error.statusCode = 405;
               throw error;
           } else user.email = req.body.email
