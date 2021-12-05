@@ -62,11 +62,11 @@ exports.updateUserPassword = async (req, res, next) => {
       const updatedUser = await user.save();
       if (!updatedUser) {
         const error = new Error("updating user password failed");
-        error.statusCode = 404;
+        error.statusCode = 400;
         throw error;
       }
   
-      res.status(201).json({
+      res.status(200).json({
         message: "user data updated"
       });
   } catch (e) {
@@ -114,11 +114,11 @@ exports.updateProfile = async (req, res, next) => {
       const updatedUser = await user.save();
       if (!updatedUser) {
         const error = new Error("updating user data failed");
-        error.statusCode = 404;
+        error.statusCode = 400;
         throw error;
       }
   
-      res.status(201).json({
+      res.status(200).json({
         message: "user data updated",
         user: updatedUser,
       });
@@ -144,7 +144,7 @@ exports.deleteProfile = async (req, res, next) => {
 
       const deleteUser = await User.deleteOne(user)
   
-      res.status(201).json({
+      res.status(200).json({
         message: "user profile deleted",
         user: deleteUser,
       });
