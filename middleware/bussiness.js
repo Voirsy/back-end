@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
 
         if(loadedUser.role !== "BUSINESS") {
             const error = new Error("user do not have bussiness privileges");
-            error.statusCode = 401;
+            error.statusCode = 403;
             throw error;
         }
 
