@@ -5,6 +5,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 
 const authRoutes = require('./routes/auth')
+const profileRoutes = require('./routes/profile')
 const bussinessRoutes = require('./routes/bussiness')
 const salonsRoutes = require('./routes/salons')
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 app.use('/auth', authRoutes)
+app.use(profileRoutes);
 app.use('/bussiness', bussinessRoutes)
 app.use('/salons', salonsRoutes)
 

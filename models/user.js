@@ -33,6 +33,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  avatarUrl: {
+    type: String,
+    required: false
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -39,6 +39,7 @@ exports.signUp = async (req, res, next) => {
     const role = req.body.role;
     const language = "en";
     const currency = "euro";
+    const avatarUrl = req.body.avatarUrl;
 
     const user = new User({
       email: email,
@@ -49,6 +50,7 @@ exports.signUp = async (req, res, next) => {
       role: role,
       language: language,
       currency: currency,
+      avatarUrl: avatarUrl,
     });
 
     const newUser = await user.save();
@@ -82,6 +84,7 @@ exports.signUp = async (req, res, next) => {
         role,
         language,
         currency,
+        avatarUrl
       },
     });
   } catch (e) {
@@ -133,38 +136,9 @@ exports.signIn = async (req, res, next) => {
         role: loadedUser.role,
         language: loadedUser.language,
         currency: loadedUser.currency,
+        avatarUrl: loadedUser.avatarUrl
       },
     });
-  } catch (e) {
-    next(e);
-  }
-};
-
-exports.getUserData = async (req, res, next) => {
-  try {
-    const userId = req.userId;
-
-    const loadedUser = await User.findOne({ _id: userId });
-
-    if (!loadedUser) {
-      const error = new Error("user with that email not exists");
-      error.statusCode = 404;
-      throw error;
-    }
-    
-    res.status(200).json({
-      user: {
-        id: loadedUser._id.toString(),
-        email: loadedUser.email,
-        fullname: loadedUser.fullname,
-        birthdate: loadedUser.birthdate,
-        phone: loadedUser.phone,
-        role: loadedUser.role,
-        language: loadedUser.language,
-        currency: loadedUser.currency,
-      },
-    });
-    
   } catch (e) {
     next(e);
   }
