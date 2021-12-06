@@ -6,6 +6,45 @@ const moment = MomentRange.extendMoment(Moment);
 const Salon = require('../models/salon')
 const User = require("../models/user")
 
+exports.getSalons = async (req, res, next) => {
+    try {
+        const city = req.body.city
+        const type = req.body.type
+        const search = req.body.search
+        const limit = 5
+        const currentPage = req.body.currentPage || 0
+
+        let filter = {}
+        if(city) filter.city = city
+        if(type) filter.type = { $all: type }
+        if(search) filter.name = { $regex: search, $options: "i" }
+
+        const salons = await Salon.find(filter).limit(limit).skip(limit * currentPage)
+        if(!salons) {
+            const error = new Error('searching salons error')
+            error.statusCode = 500
+            throw error
+        }
+
+        const mappedSalons = await salons.map(salon => {
+            return {
+                _id: salon._id.toString(),
+                name: salon.name,
+                address: salon.address,
+                city: salon.city,
+                imageUrl: salon.image
+            }
+        })
+
+        res.status(200).json({
+            message: 'salons returned',
+            salons: mappedSalons
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
 exports.freeHours = async (req, res, next) => {
     try {
         const salonId = req.body.salonId

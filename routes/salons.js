@@ -6,6 +6,7 @@ const isAuth = require('../middleware/auth')
 
 const router = express.Router()
 
+router.post('/', salonsController.getSalons)
 router.post('/freehours', salonsController.freeHours)
 router.post('/reservation', isAuth, salonsController.confirmReservation)
 
