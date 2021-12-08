@@ -10,4 +10,6 @@ router.patch('/profile', isAuth, profileController.updateProfile)
 router.post('/profile', isAuth, profileController.updateUserPassword)
 router.delete('/profile', isAuth, profileController.deleteProfile)
 
+router.post('/profile/favorites', isAuth, profileController.addToFavorites)
+
 module.exports = router

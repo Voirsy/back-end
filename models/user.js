@@ -36,7 +36,12 @@ const userSchema = new Schema({
   avatarUrl: {
     type: String,
     required: false
-  }
+  },
+  favorites: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Salon',
+    required: true
+  }]
 });
 
 module.exports = mongoose.model("User", userSchema);
