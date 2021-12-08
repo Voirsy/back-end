@@ -43,8 +43,6 @@ exports.getSalons = async (req, res, next) => {
             }
         }))
 
-        console.log(mappedSalons)
-
         if(req.body.sortBy === 'popularity') mappedSalons.sort((a, b) => a.popularity > b.popularity ? -1 : a.popularity < b.popularity ? 1 : 0)
 
         res.status(200).json({
