@@ -26,15 +26,26 @@ exports.getSalons = async (req, res, next) => {
             throw error
         }
 
-        const mappedSalons = await salons.map(salon => {
+        salons.forEach(async salon => {
+            
+        })
+
+        const mappedSalons = await Promise.all(salons.map(async salon => {
+            const count = await User.find({ favorites: { $all: [salon._id] } }).count()
+
             return {
                 _id: salon._id.toString(),
                 name: salon.name,
                 address: salon.address,
                 city: salon.city,
-                imageUrl: salon.image
+                imageUrl: salon.image,
+                popularity: count
             }
-        })
+        }))
+
+        console.log(mappedSalons)
+
+        if(req.body.sortBy === 'popularity') mappedSalons.sort((a, b) => a.popularity > b.popularity ? -1 : a.popularity < b.popularity ? 1 : 0)
 
         res.status(200).json({
             message: 'salons returned',
