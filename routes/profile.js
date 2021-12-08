@@ -11,5 +11,7 @@ router.post('/profile', isAuth, profileController.updateUserPassword)
 router.delete('/profile', isAuth, profileController.deleteProfile)
 
 router.post('/profile/favorites', isAuth, profileController.addToFavorites)
+router.get('/profile/favorites', isAuth, profileController.getFavorites)
+router.delete('/profile/favorites', isAuth, profileController.deleteFromFavorites)
 
 module.exports = router

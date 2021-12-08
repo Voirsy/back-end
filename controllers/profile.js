@@ -154,6 +154,30 @@ exports.deleteProfile = async (req, res, next) => {
   }
 }
 
+exports.getFavorites = async (req, res, next) => {
+  try {
+      if(!req.isAuth) {
+          const error = new Error("user not authenticated");
+          error.statusCode = 401;
+          throw error;
+      }
+
+      const user = await User.findOne({ _id: req.userId }).select('favorites -_id').populate('favorites', '_id name ')
+      if(!user) {
+          const error = new Error("user not found");
+          error.statusCode = 404;
+          throw error;
+      }
+  
+      res.status(200).json({
+        message: "user favorites returned",
+        favorites: user.favorites,
+      });
+  } catch (e) {
+    next(e);
+  }
+}
+
 exports.addToFavorites = async (req, res, next) => {
   try {
     const salonId = req.body.salonId
@@ -173,7 +197,7 @@ exports.addToFavorites = async (req, res, next) => {
 
     const salon = await Salon.findOne({ _id: salonId })
     if(!user) {
-        const error = new Error("user not found");
+        const error = new Error("salon not found");
         error.statusCode = 404;
         throw error;
     }
@@ -197,6 +221,43 @@ exports.addToFavorites = async (req, res, next) => {
 
     res.status(200).json({
       message: "salon successfully added to favorites"
+    });
+  } catch (e) {
+    next(e);
+  }
+}
+
+exports.deleteFromFavorites = async (req, res, next) => {
+  try {
+    const salonId = req.body.salonId
+
+    if(!req.isAuth) {
+        const error = new Error("user not authenticated");
+        error.statusCode = 401;
+        throw error;
+    }
+
+    const user = await User.findOne({ _id: req.userId })
+    if(!user) {
+        const error = new Error("user not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const newFavorites = await user.favorites.filter(salon => {
+      return salon.toString() !== salonId;
+    })
+
+    user.favorites = newFavorites
+    const updatedUser = await user.save();
+    if (!updatedUser) {
+      const error = new Error("updating user data failed");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    res.status(200).json({
+      message: "salon successfully removed from favorites"
     });
   } catch (e) {
     next(e);
