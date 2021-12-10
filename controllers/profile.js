@@ -143,6 +143,7 @@ exports.deleteProfile = async (req, res, next) => {
           throw error;
       }
 
+      const deleteSalons = await User.deleteMany({ owner: user })
       const deleteUser = await User.deleteOne(user)
   
       res.status(200).json({
