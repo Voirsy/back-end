@@ -11,43 +11,40 @@ exports.getSalons = async (req, res, next) => {
         const city = req.body.city
         const type = req.body.type
         const search = req.body.search
-        const limit = 5
-        const currentPage = req.body.currentPage || 0
+        const limitPerPage = req.body.limitPerPage || 5
+        const currentPage = req.body.currentPage || 1
 
         let filter = {}
         if(city) filter.city = city
         if(type) filter.type = { $all: type }
         if(search) filter.name = { $regex: search, $options: "i" }
 
-        const salons = await Salon.find(filter).limit(limit).skip(limit * currentPage)
+        const salons = await Salon.find(filter)
         if(!salons) {
             const error = new Error('searching salons error')
             error.statusCode = 500
             throw error
         }
 
-        salons.forEach(async salon => {
-            
-        })
-
-        const mappedSalons = await Promise.all(salons.map(async salon => {
-            const count = await User.find({ favorites: { $all: [salon._id] } }).count()
-
+        const mappedSalons = await salons.map(salon => {
             return {
                 _id: salon._id.toString(),
                 name: salon.name,
                 address: salon.address,
                 city: salon.city,
                 imageUrl: salon.image,
-                popularity: count
+                popularity: salon.popularity
             }
-        }))
+        })
 
         if(req.body.sortBy === 'popularity') mappedSalons.sort((a, b) => a.popularity > b.popularity ? -1 : a.popularity < b.popularity ? 1 : 0)
 
+        const paginateSalons = mappedSalons.slice((currentPage - 1) * limit, currentPage * limit)
+
+
         res.status(200).json({
             message: 'salons returned',
-            salons: mappedSalons
+            salons: paginateSalons
         })
     } catch (e) {
         next(e)

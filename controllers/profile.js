@@ -196,7 +196,7 @@ exports.addToFavorites = async (req, res, next) => {
     }
 
     const salon = await Salon.findOne({ _id: salonId })
-    if(!user) {
+    if(!salon) {
         const error = new Error("salon not found");
         error.statusCode = 404;
         throw error;
@@ -215,6 +215,14 @@ exports.addToFavorites = async (req, res, next) => {
     const updatedUser = await user.save();
     if (!updatedUser) {
       const error = new Error("updating user data failed");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    salon.popularity += 1
+    const updatedSalon = await salon.save();
+    if (!updatedSalon) {
+      const error = new Error("updating salon data failed");
       error.statusCode = 400;
       throw error;
     }
@@ -244,6 +252,22 @@ exports.deleteFromFavorites = async (req, res, next) => {
         throw error;
     }
 
+    const salon = await Salon.findOne({ _id: salonId })
+    if(!salon) {
+        const error = new Error("salon not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const findSalon = await user.favorites.filter(salon => {
+      return salon.toString() === salonId;
+    })
+    if(findSalon.length < 1) {
+      const error = new Error("salon not found in favorite list");
+      error.statusCode = 409;
+      throw error;
+    }
+
     const newFavorites = await user.favorites.filter(salon => {
       return salon.toString() !== salonId;
     })
@@ -252,6 +276,14 @@ exports.deleteFromFavorites = async (req, res, next) => {
     const updatedUser = await user.save();
     if (!updatedUser) {
       const error = new Error("updating user data failed");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    salon.popularity -= 1
+    const updatedSalon = await salon.save();
+    if (!updatedSalon) {
+      const error = new Error("updating salon data failed");
       error.statusCode = 400;
       throw error;
     }
