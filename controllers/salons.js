@@ -2,6 +2,7 @@ const Moment = require('moment');
 const MomentRange = require('moment-range');
  
 const moment = MomentRange.extendMoment(Moment);
+const mongoose = require('mongoose');
 
 const Salon = require('../models/salon')
 const User = require("../models/user")
@@ -51,6 +52,62 @@ exports.getSalons = async (req, res, next) => {
         res.status(200).json({
             message: 'salons returned',
             salons: paginateSalons
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.getSalon = async (req, res, next) => {
+    try {
+        const salonId = mongoose.Types.ObjectId(req.params.id)
+
+        const salon = await Salon.findOne(salonId).populate('ratings.customer')
+        if(!salon) {
+            const error = new Error('salon not found')
+            error.statusCode = 404
+            throw error
+        }
+
+        const mappedSalon =  {         
+            _id: salon._id.toString(),
+            name: salon.name,
+            address: salon.address,
+            city: salon.city,
+            type: salon.type,
+            description: salon.description,
+            openingHours: salon.openingHours.map(day => {
+                return {
+                    name: day.name,
+                    open: day.open,
+                    close: day.close
+                }
+            }),
+            contact: salon.contact,
+            services: salon.services,
+            crew: salon.crew.map(worker => {
+                return {
+                    _id: worker._id.toString(),
+                    name: worker.name,
+                }
+            }),
+            score: salon.score,
+            ratings: salon.ratings.map(rating => {
+                return {
+                    customer: {
+                        _id: rating.customer._id.toString(),
+                        fullname: rating.customer.fullname
+                    },
+                    rating: rating.rating,
+                    opinion: rating.opinion,
+                    date: rating.date
+                }
+            })
+        }
+
+        res.status(200).json({
+            message: 'salon returned',
+            salon: mappedSalon
         })
     } catch (e) {
         next(e)
