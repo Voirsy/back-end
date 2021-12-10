@@ -9,5 +9,6 @@ const router = express.Router()
 router.post('/', salonsController.getSalons)
 router.post('/freehours', salonsController.freeHours)
 router.post('/reservation', isAuth, salonsController.confirmReservation)
+router.post('/rating', isAuth, salonsController.addRating)
 
 module.exports = router

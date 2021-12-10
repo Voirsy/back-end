@@ -11,7 +11,7 @@ exports.getSalons = async (req, res, next) => {
         const city = req.body.city
         const type = req.body.type
         const search = req.body.search
-        const limitPerPage = req.body.limitPerPage || 5
+        const limit = req.body.limitPerPage || 5
         const currentPage = req.body.currentPage || 1
 
         let filter = {}
@@ -26,18 +26,33 @@ exports.getSalons = async (req, res, next) => {
             throw error
         }
 
-        const mappedSalons = await salons.map(salon => {
+        const mappedSalons = await Promise.all(salons.map(async salon => {
+            
+            const quantityOfRating = salon.ratings.length
+            let score = 0
+            let finalScore = 0
+            if (quantityOfRating > 0) {
+                await salon.ratings.forEach(rating => {
+                    score += rating.rating
+                })
+                finalScore = score / quantityOfRating
+            }
+
             return {
                 _id: salon._id.toString(),
                 name: salon.name,
                 address: salon.address,
                 city: salon.city,
                 imageUrl: salon.image,
-                popularity: salon.popularity
+                popularity: salon.popularity,
+                score: finalScore,
+                quantityOfRating: quantityOfRating
             }
-        })
+        }))
 
-        if(req.body.sortBy === 'popularity') mappedSalons.sort((a, b) => a.popularity > b.popularity ? -1 : a.popularity < b.popularity ? 1 : 0)
+        if(req.body.sortBy === 'MostPopular') mappedSalons.sort((a, b) => a.popularity > b.popularity ? -1 : a.popularity < b.popularity ? 1 : 0)
+        if(req.body.sortBy === 'TopRated') mappedSalons.sort((a, b) => a.score > b.score ? -1 : a.score < b.score ? 1 : 0)
+        if(req.body.sortBy === 'QuantityOfRating') mappedSalons.sort((a, b) => a.quantityOfRating > b.quantityOfRating ? -1 : a.quantityOfRating < b.quantityOfRating ? 1 : 0)
 
         const paginateSalons = mappedSalons.slice((currentPage - 1) * limit, currentPage * limit)
 
@@ -209,7 +224,9 @@ exports.confirmReservation = async (req, res, next) => {
 
         const endHour = startHour.clone().add(service.duration, 'minutes')
         const checkSchedule = worker.schedule.filter(task => {
-            if(endHour.isSameOrBefore(moment(task.start).utc()) || startHour.isSameOrAfter(moment(task.end).utc())) return false
+            const start = moment(task.start).utc()
+            const end = moment(task.end).utc()
+            if(endHour.isSameOrBefore(start) || startHour.isSameOrAfter(end)) return false
             else return true
         })
         if(checkSchedule.length > 0) {
@@ -221,17 +238,74 @@ exports.confirmReservation = async (req, res, next) => {
         worker.schedule.push({
             customer: loadedUser,
             service: serviceId,
-            start: startHour,
-            end: endHour
+            start: startHour.toISOString(),
+            end: endHour.toISOString()
         })
 
         const updatedSalon = await salon.save()
+        if (!updatedSalon) {
+            const error = new Error("updating salon failed");
+            error.statusCode = 400;
+            throw error;
+        }
 
         res.status(200).json({
             message: 'successfully reserved'
         })
     }
     catch (e) {
+        next(e)
+    }
+}
+
+exports.addRating = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.body.salonId
+        const score = req.body.score
+        const opinion = req.body.opinion || ''
+        const date = moment().utc().toISOString()
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const loadedUser = await User.findOne({ _id: userId });
+        if (!loadedUser) {
+            const error = new Error("selected user not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("salon not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const rating = {
+            customer: loadedUser,
+            rating: score,
+            opinion: opinion,
+            date: date
+        }
+
+        salon.ratings.push(rating)
+        const updatedSalon = await salon.save();
+        if (!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'successfully saved rating'
+        })
+    } catch (e) {
         next(e)
     }
 }
