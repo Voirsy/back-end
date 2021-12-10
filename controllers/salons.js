@@ -26,17 +26,8 @@ exports.getSalons = async (req, res, next) => {
             throw error
         }
 
-        const mappedSalons = await Promise.all(salons.map(async salon => {
-            
+        const mappedSalons = await Promise.all(salons.map(async salon => {         
             const quantityOfRating = salon.ratings.length
-            let score = 0
-            let finalScore = 0
-            if (quantityOfRating > 0) {
-                await salon.ratings.forEach(rating => {
-                    score += rating.rating
-                })
-                finalScore = score / quantityOfRating
-            }
 
             return {
                 _id: salon._id.toString(),
@@ -45,7 +36,7 @@ exports.getSalons = async (req, res, next) => {
                 city: salon.city,
                 imageUrl: salon.image,
                 popularity: salon.popularity,
-                score: finalScore,
+                score: salon.score,
                 quantityOfRating: quantityOfRating
             }
         }))
@@ -287,6 +278,15 @@ exports.addRating = async (req, res, next) => {
             throw error;
         }
 
+        const alreadyRated = await salon.ratings.filter(rating => {
+            return rating.customer.toString() === userId;
+        })
+        if(alreadyRated.length > 0) {
+            const error = new Error("salon already rated by selected user");
+            error.statusCode = 409;
+            throw error;
+        }
+
         const rating = {
             customer: loadedUser,
             rating: score,
@@ -295,6 +295,69 @@ exports.addRating = async (req, res, next) => {
         }
 
         salon.ratings.push(rating)
+        
+        if(salon.score > 0) salon.score = ( salon.score + score ) / 2
+        else salon.score = score
+
+        const updatedSalon = await salon.save();
+        if (!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(201).json({
+            message: 'successfully saved rating'
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.deleteRating = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.body.salonId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const loadedUser = await User.findOne({ _id: userId });
+        if (!loadedUser) {
+            const error = new Error("selected user not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("salon not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const newRatings = await salon.ratings.filter(rating => {
+            return rating.customer.toString() !== userId;
+        })
+
+        salon.ratings = newRatings
+
+        const quantityOfRating = salon.ratings.length
+        let score = 0
+        let finalScore = 0
+        if(quantityOfRating > 0) {
+            await salon.ratings.forEach(rating => {
+                score += rating.rating
+            })
+            finalScore = score / quantityOfRating
+        }
+
+        salon.score = finalScore
+
         const updatedSalon = await salon.save();
         if (!updatedSalon) {
             const error = new Error("updating salon data failed");
@@ -303,7 +366,7 @@ exports.addRating = async (req, res, next) => {
         }
 
         res.status(200).json({
-            message: 'successfully saved rating'
+            message: 'successfully remove rating'
         })
     } catch (e) {
         next(e)

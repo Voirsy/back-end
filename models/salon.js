@@ -64,6 +64,11 @@ const salonSchema = new Schema({
         required: true,
         default: 0
     },
+    score: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     ratings: {
         type: [{
             customer: {
