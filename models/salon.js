@@ -59,8 +59,13 @@ const salonSchema = new Schema({
             }
         }
     ],
-    ratings: [
-        {
+    score: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    ratings: {
+        type: [{
             customer: {
                 type: Schema.Types.ObjectId,
                 ref: 'User',
@@ -74,10 +79,11 @@ const salonSchema = new Schema({
                 type: String,
                 required: false
             }
-        }
-    ],
-    services: [
-        {
+        }],
+        default: []
+    },
+    services: {
+        type: [{
             name: {
                 type: String,
                 required: true
@@ -94,10 +100,11 @@ const salonSchema = new Schema({
                 type: String,
                 required: false
             }
-        }
-    ],
-    crew: [
-        {
+        }],
+        default: []
+    },
+    crew: {
+        type: [{
             name: {
                 type: String,
                 required: true
@@ -123,8 +130,9 @@ const salonSchema = new Schema({
                     }
                 }
             ]
-        }
-    ]
+        }],
+        default: []
+    }
 })
 
 module.exports = mongoose.model('Salon', salonSchema)

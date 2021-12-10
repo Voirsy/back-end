@@ -37,11 +37,14 @@ const userSchema = new Schema({
     type: String,
     required: false
   },
-  favorites: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Salon',
-    required: true
-  }]
+  favorites: {
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Salon',
+      required: true
+    }],
+    default: []
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
