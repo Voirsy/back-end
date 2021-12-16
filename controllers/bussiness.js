@@ -1,4 +1,5 @@
 const Salon = require('../models/salon')
+const moment = require('moment');
 
 exports.createSalon = async (req, res, next) => {
     try {
@@ -89,7 +90,7 @@ exports.getSalons = async (req, res, next) => {
     }
 }
 
-exports.getSalon = async (req, res, next) => {
+exports.getSalonInfo = async (req, res, next) => {
     try {
         const isAuth = req.isAuth
         const userId = req.userId
@@ -107,8 +108,6 @@ exports.getSalon = async (req, res, next) => {
             error.statusCode = 404;
             throw error;
         }
-
-        console.log(salon.owner)
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
@@ -143,6 +142,59 @@ exports.getSalon = async (req, res, next) => {
         res.status(200).json({
             message: 'salon returned',
             salon: mappedSalon
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.getSalonSchedule = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+        const now = moment().utc()
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId }).populate('crew.schedule.customer crew.schedule.service')
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        let scheduleArray = []
+        salon.crew.forEach(worker => {
+            worker.schedule.forEach(task => {
+                scheduleArray.push({
+                    worker: worker.name,
+                    customer: task.customer.fullname,
+                    phone: task.customer.phone,
+                    start: task.start,
+                    end: task.end
+                })
+            })
+        })
+
+        const filteredSchedule = await scheduleArray.filter(task => {
+            const end = moment(task.end).utc()
+            return end.isAfter(now)
+        })
+
+        res.status(200).json({
+            message: 'salon schedule returned',
+            salon: filteredSchedule
         })
     } catch (e) {
         next(e)
