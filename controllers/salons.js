@@ -9,7 +9,7 @@ const User = require("../models/user")
 
 exports.getSalons = async (req, res, next) => {
     try {
-        const city = req.body.city
+        const location = req.body.city
         const type = req.body.type
         const search = req.body.search
         const limit = req.body.limitPerPage || 5
@@ -23,7 +23,7 @@ exports.getSalons = async (req, res, next) => {
         const salons = await Salon.find(filter)
         if(!salons) {
             const error = new Error('searching salons error')
-            error.statusCode = 500
+            error.statusCode = 400
             throw error
         }
 
