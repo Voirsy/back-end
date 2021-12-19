@@ -8,6 +8,9 @@ const isBussiness = require('../middleware/bussiness')
 const router = express.Router()
 
 router.post('/salon', isAuth, isBussiness, bussinessController.createSalon)
+router.patch('/salon/:id', isAuth, isBussiness, bussinessController.updateSalon)
+router.delete('/salon/:id', isAuth, isBussiness, bussinessController.deleteSalon)
+
 router.get('/salons', isAuth, isBussiness, bussinessController.getSalons)
 router.get('/salon/:id/info', isAuth, isBussiness, bussinessController.getSalonInfo)
 router.get('/salon/:id/schedule', isAuth, isBussiness, bussinessController.getSalonSchedule)

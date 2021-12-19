@@ -53,6 +53,106 @@ exports.createSalon = async (req, res, next) => {
     }
 }
 
+exports.updateSalon = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const name = req.body.name
+        const address = req.body.address
+        const contact = req.body.contact
+        const description = req.body.description
+        const type = req.body.type
+        const city = req.body.city
+        const openingHours = req.body.openingHours
+
+        if(name) salon.name = name
+        if(address) salon.address = address
+        if(contact) salon.contact = contact
+        if(description) salon.description = description
+        if(type) salon.type = type
+        if(city) salon.city = city
+        if(openingHours) salon.openingHours = openingHours
+
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error('updating salon data failed')
+            error.statusCode = 400
+            throw error
+        }
+
+        res.status(200).json({
+            message: 'salon updated',
+            salon: updatedSalon
+        })
+    }
+    catch (e) {
+        next(e)
+    }
+}
+
+exports.deleteSalon = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const deleteSalon = await Salon.deleteOne({ _id: salonId })
+        if(!deleteSalon) {
+            const error = new Error('deleting salon failed')
+            error.statusCode = 400
+            throw error
+        }
+
+        res.status(200).json({
+            message: 'salon deleted',
+            salon: deleteSalon
+        })
+    }
+    catch (e) {
+        next(e)
+    }
+}
+
 exports.getSalons = async (req, res, next) => {
     try {
         const isAuth = req.isAuth
