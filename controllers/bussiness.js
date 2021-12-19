@@ -248,7 +248,280 @@ exports.addService = async (req, res, next) => {
 
         res.status(200).json({
             message: 'service successfully created',
-            service: newService
+            services: updatedSalon.services
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.updateService = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+        const serviceId = req.body.serviceId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const [ service ] = await salon.services.filter(service => {
+            return service._id.toString() === serviceId
+        })
+
+        if(!service) {
+            const error = new Error("can not find service");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const name = req.body.name
+        const price = req.body.price
+        const duration = req.body.duration
+        const description = req.body.description
+
+        if(name) service.name = name
+        if(price) service.price = price
+        if(duration) service.duration = duration
+        if(description) service.description = description
+
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'service successfully updated',
+            services: updatedSalon.services
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.deleteService = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+        const serviceId = req.body.serviceId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const services = await salon.services.filter(service => {
+            return service._id.toString() !== serviceId
+        })
+
+        if(!services) {
+            const error = new Error("error when deleting a service");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        salon.services = services
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'service successfully deleted',
+            services: updatedSalon.services
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.addCrewMember = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+
+        const name = req.body.name
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const newCrewMember = {
+            name: name,
+            schedule: []
+        }
+
+        salon.crew.push(newCrewMember)
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'crew member successfully created',
+            crew: updatedSalon.crew
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.updateCrewMember = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+        const crewId = req.body.crewId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const [ crewMember ] = await salon.crew.filter(crewMember => {
+            return crewMember._id.toString() === crewId
+        })
+
+        if(!crewMember) {
+            const error = new Error("can not find crew member");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const name = req.body.name
+
+        if(name) crewMember.name = name
+
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'crew member successfully updated',
+            crew: updatedSalon.crew
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.deleteCrewMember = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+        const crewId = req.body.crewId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const crew = await salon.crew.filter(crewMember => {
+            return crewMember._id.toString() !== crewId
+        })
+
+        if(!crew) {
+            const error = new Error("error when deleting a crew member");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        salon.crew = crew
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'crew member successfully deleted',
+            services: updatedSalon.crew
         })
     } catch (e) {
         next(e)
