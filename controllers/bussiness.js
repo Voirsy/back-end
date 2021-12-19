@@ -200,3 +200,57 @@ exports.getSalonSchedule = async (req, res, next) => {
         next(e)
     }
 }
+
+exports.addService = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const userId = req.userId
+        const salonId = req.params.id
+
+        const name = req.body.name
+        const price = req.body.price
+        const duration = req.body.duration
+        const description = req.body.description
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("can not find salon with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(salon.owner.toString() !== userId.toString()) {
+            const error = new Error("user is not owner of selected salon");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const newService = {
+            name: name,
+            price: price,
+            duration: duration,
+            description: description
+        }
+
+        salon.services.push(newService)
+        const updatedSalon = await salon.save()
+        if(!updatedSalon) {
+            const error = new Error("updating salon data failed");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'service successfully created',
+            service: newService
+        })
+    } catch (e) {
+        next(e)
+    }
+}

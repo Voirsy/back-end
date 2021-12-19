@@ -15,11 +15,11 @@ const salonSchema = new Schema({
         type: String,
         required: true
     },
-    type: {
+    type: [{
         type: String,
         required: true,
         enum: ['hairdresser', 'barber', 'beautician', 'tatooist']
-    },
+    }],
     contact: {
         phone: {
             type: String,

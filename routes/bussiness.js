@@ -11,5 +11,6 @@ router.post('/salon', isAuth, isBussiness, bussinessController.createSalon)
 router.get('/salons', isAuth, isBussiness, bussinessController.getSalons)
 router.get('/salon/:id/info', isAuth, isBussiness, bussinessController.getSalonInfo)
 router.get('/salon/:id/schedule', isAuth, isBussiness, bussinessController.getSalonSchedule)
+router.post('/salon/:id/service', isAuth, isBussiness, bussinessController.addService)
 
 module.exports = router
