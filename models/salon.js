@@ -15,11 +15,11 @@ const salonSchema = new Schema({
         type: String,
         required: true
     },
-    type: {
+    type: [{
         type: String,
         required: true,
         enum: ['hairdresser', 'barber', 'beautician', 'tatooist']
-    },
+    }],
     contact: {
         phone: {
             type: String,
@@ -59,8 +59,18 @@ const salonSchema = new Schema({
             }
         }
     ],
-    ratings: [
-        {
+    popularity: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    score: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    ratings: {
+        type: [{
             customer: {
                 type: Schema.Types.ObjectId,
                 ref: 'User',
@@ -72,12 +82,18 @@ const salonSchema = new Schema({
             },
             opinion: {
                 type: String,
-                required: false
+                required: false,
+                default: ''
+            },
+            date: {
+                type: String,
+                required: true
             }
-        }
-    ],
-    services: [
-        {
+        }],
+        default: []
+    },
+    services: {
+        type: [{
             name: {
                 type: String,
                 required: true
@@ -94,10 +110,11 @@ const salonSchema = new Schema({
                 type: String,
                 required: false
             }
-        }
-    ],
-    crew: [
-        {
+        }],
+        default: []
+    },
+    crew: {
+        type: [{
             name: {
                 type: String,
                 required: true
@@ -123,8 +140,9 @@ const salonSchema = new Schema({
                     }
                 }
             ]
-        }
-    ]
+        }],
+        default: []
+    }
 })
 
 module.exports = mongoose.model('Salon', salonSchema)

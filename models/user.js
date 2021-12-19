@@ -36,6 +36,14 @@ const userSchema = new Schema({
   avatarUrl: {
     type: String,
     required: false
+  },
+  favorites: {
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Salon',
+      required: true
+    }],
+    default: []
   }
 });
 
