@@ -1,14 +1,42 @@
-const Salon = require('../models/salon')
 const moment = require('moment');
+
+const Salon = require('../models/salon')
+const City = require('../models/city')
+const Category = require('../models/category');
+const category = require('../models/category');
 
 exports.createSalon = async (req, res, next) => {
     try {
         const isAuth = req.isAuth
-        const userId = req.userId;
+        const userId = req.userId
 
         if(!isAuth) {
             const error = new Error("user not authenticated");
             error.statusCode = 401;
+            throw error;
+        }
+
+        const city = req.body.city
+        const findCity = await City.findOne({ _id: city })
+        if(!findCity) {
+            const error = new Error("can not find city with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const categories = await Category.find().select('_id')
+        const mappedCategories = await categories.map(category => {
+            return category._id.toString()
+        })
+        
+        const type = req.body.type
+        const checkType = await type.filter(id => {
+            return !mappedCategories.includes(id)
+        })
+
+        if(checkType.length > 0) {
+            const error = new Error("can not find category with selected id");
+            error.statusCode = 404;
             throw error;
         }
 
@@ -17,8 +45,6 @@ exports.createSalon = async (req, res, next) => {
         const address = req.body.address
         const contact = req.body.contact
         const description = req.body.description
-        const type = req.body.type
-        const city = req.body.type
         const services = req.body.services
         const crew = req.body.crew
         const openingHours = req.body.openingHours
@@ -78,12 +104,34 @@ exports.updateSalon = async (req, res, next) => {
             throw error;
         }
 
+        const city = req.body.city
+        const findCity = await City.findOne({ _id: city })
+        if(!findCity) {
+            const error = new Error("can not find city with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const categories = await Category.find().select('_id')
+        const mappedCategories = await categories.map(category => {
+            return category._id.toString()
+        })
+        
+        const type = req.body.type
+        const checkType = await type.filter(id => {
+            return !mappedCategories.includes(id)
+        })
+
+        if(checkType.length > 0) {
+            const error = new Error("can not find category with selected id");
+            error.statusCode = 404;
+            throw error;
+        }
+
         const name = req.body.name
         const address = req.body.address
         const contact = req.body.contact
         const description = req.body.description
-        const type = req.body.type
-        const city = req.body.city
         const openingHours = req.body.openingHours
 
         if(name) salon.name = name
@@ -164,7 +212,7 @@ exports.getSalons = async (req, res, next) => {
             throw error;
         }
 
-        const salons = await Salon.find({ owner: userId })
+        const salons = await Salon.find({ owner: userId }).populate('type city')
         if(!salons) {
             const error = new Error("error when searching for salons");
             error.statusCode = 400;

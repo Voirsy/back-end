@@ -16,9 +16,9 @@ const salonSchema = new Schema({
         required: true
     },
     type: [{
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true,
-        enum: ['hairdresser', 'barber', 'beautician', 'tatooist']
+        ref: 'Category'
     }],
     contact: {
         phone: {
@@ -35,8 +35,9 @@ const salonSchema = new Schema({
         required: false
     },
     city: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'City'
     },
     description: {
         type: String,

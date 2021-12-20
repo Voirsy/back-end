@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth')
 const profileRoutes = require('./routes/profile')
 const bussinessRoutes = require('./routes/bussiness')
 const salonsRoutes = require('./routes/salons')
+const dataRoutes = require('./routes/appData')
 
 const port = process.env.PORT || 8080
 const app = express()
@@ -23,6 +24,7 @@ app.use('/auth', authRoutes)
 app.use(profileRoutes);
 app.use('/bussiness', bussinessRoutes)
 app.use('/salons', salonsRoutes)
+app.use('/data', dataRoutes)
 
 app.use((error, req, res, next) => {
     console.log(error)
