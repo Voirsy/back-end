@@ -45,9 +45,11 @@ exports.createSalon = async (req, res, next) => {
         const address = req.body.address
         const contact = req.body.contact
         const description = req.body.description
-        const services = req.body.services
-        const crew = req.body.crew
-        const openingHours = req.body.openingHours
+        const type = req.body.type
+        const city = req.body.city
+        const services = req.body.services || []
+        const crew = req.body.crew || []
+        const openingHours = req.body.openingHours || []
 
         const salon = new Salon({
             owner: owner,
