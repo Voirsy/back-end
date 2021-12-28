@@ -361,14 +361,11 @@ paths:
         500:
           $ref: '#/components/responses/500'
 # ##################### FREE HOURS #####################
-  /salons/{salonId}/freehours:
+  /salons/freehours:
     post:
       summary: Check if the service is available within the time range
       tags:
       - salons
-      parameters:
-        - in: path
-          $ref: '#/components/parameters/SalonId'
       requestBody:
         content:
           application/json:
@@ -381,19 +378,15 @@ paths:
                   serviceId: 
                     type: string
                     example: 60ae96dad2396a054c3ab53e
-                  date:
-                    type: string
-                    format: date-time
-                    example: 1997-03-12T00:00:00Z
                   timeRange:
                     type: object
-                    properties: 
+                    properties:
                       start: 
                         type: string
-                        example: 10:00
+                        example: 2021-12-28 09:00
                       end:
                         type: string
-                        example: 11:00
+                        example: 2021-12-28 21:00
       responses:
         200:
           description: successfully reserved
@@ -443,14 +436,11 @@ paths:
         500:
           $ref: '#/components/responses/500'
 # ##################### RESERVATION #####################
-  /salons/{salonId}/reservation:
+  /salons/reservation:
     post:
       summary: Book the service within the time range
       tags:
       - salons
-      parameters:
-        - in: path
-          $ref: '#/components/parameters/SalonId'
       requestBody:
         content:
           application/json:
@@ -463,16 +453,80 @@ paths:
                   serviceId: 
                     type: string
                     example: 60ae96dad2396a054c3ab53e
+                  workerId:
+                    type: string 
+                    example: 95ye96dad2396a054c3ab53e
                   date:
                     type: string
                     format: date-time
-                    example: 1997-03-12T00:00:00Z
-                  hours:
-                    type: string
-                    example: 10:15
+                    example: 1997-03-12T11:00:00Z
       responses:
         200:
           description: successfully reserved
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        405:
+          description: Validation exception
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  errors: 
+                    type: array
+                    items: 
+                      type: object
+                      properties:
+                        date: 
+                          type: string
+                          example: 'invalid date'
+                  message: 
+                    type: string
+                    example: validation error
+        500:
+          $ref: '#/components/responses/500'
+# ##################### SERVICE DATA #####################
+  /salons/{salonId}/service/{serviceId}:
+    post:
+      summary: Fetch an information about service
+      tags:
+      - salons
+      parameters:
+        - in: path
+          $ref: '#/components/parameters/SalonId'
+        - in: path
+          $ref: '#/components/parameters/ServiceId'
+      responses:
+        200:
+          description: Data successfully fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  _id: 
+                    type: string
+                    example: 615b24eac9fac70ee4d58b8e
+                  name: 
+                    type: string
+                    example: Trwała ondulacja
+                    minLength: 5
+                  price: 
+                    type: number
+                    format: float
+                    example: 42.80
+                    description: Price of the service Dolars
+                  duration: 
+                    type: integer
+                    example: 80
+                    minimum: 15
+                    multipleOf: 15
+                    description: Duration of the service minutes
+                  description:
+                    type: string
+                    example: Najnowszy trend w męskich fryzurach.
         400:
           $ref: '#/components/responses/400'
         401:
@@ -1317,6 +1371,13 @@ components:
         type: string
       required: true
       description: ID of the salon
+    ServiceId:
+      name: serviceId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: ID of the service
   responses:
     400:
       description: Bad request
