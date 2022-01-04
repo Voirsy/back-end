@@ -102,7 +102,7 @@ exports.updateSalon = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -182,7 +182,7 @@ exports.deleteSalon = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -261,7 +261,7 @@ exports.getSalonInfo = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -320,7 +320,7 @@ exports.getSalonSchedule = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -377,7 +377,7 @@ exports.addService = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -427,7 +427,7 @@ exports.updateService = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -489,7 +489,7 @@ exports.deleteService = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -543,7 +543,7 @@ exports.addCrewMember = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -591,7 +591,7 @@ exports.updateCrewMember = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
@@ -647,7 +647,7 @@ exports.deleteCrewMember = async (req, res, next) => {
 
         if(salon.owner.toString() !== userId.toString()) {
             const error = new Error("user is not owner of selected salon");
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
