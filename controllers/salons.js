@@ -433,3 +433,41 @@ exports.deleteRating = async (req, res, next) => {
         next(e)
     }
 }
+
+exports.serviceDetails = async (req, res, next) => {
+    try {
+        const isAuth = req.isAuth
+        const salonId = req.body.salonId
+        const serviceId = req.body.serviceId
+
+        if(!isAuth) {
+            const error = new Error("user not authenticated");
+            error.statusCode = 401;
+            throw error;
+        }
+
+        const salon = await Salon.findOne({ _id: salonId })
+        if(!salon) {
+            const error = new Error("salon not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const [ service ] = salon.services.filter(service => {
+            return service._id.toString() === serviceId
+        })
+
+        if(!service) {
+            const error = new Error("service not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        res.status(200).json({
+            message: 'service details returned',
+            service: service
+        })
+    } catch (e) {
+        next(e)
+    }
+}
