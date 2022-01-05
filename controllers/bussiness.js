@@ -3,7 +3,6 @@ const moment = require('moment');
 const Salon = require('../models/salon')
 const City = require('../models/city')
 const Category = require('../models/category');
-const category = require('../models/category');
 
 exports.createSalon = async (req, res, next) => {
     try {
@@ -44,9 +43,9 @@ exports.createSalon = async (req, res, next) => {
         const name = req.body.name
         const address = req.body.address
         const contact = req.body.contact
+        const portfolio = req.body.portfolio
+        const image = req.body.image
         const description = req.body.description
-        const type = req.body.type
-        const city = req.body.city
         const services = req.body.services || []
         const crew = req.body.crew || []
         const openingHours = req.body.openingHours || []
@@ -56,6 +55,8 @@ exports.createSalon = async (req, res, next) => {
             name: name,
             address: address,
             contact: contact,
+            image: image,
+            portfolio: portfolio,
             description: description,
             type: type,
             city: city,
@@ -135,6 +136,8 @@ exports.updateSalon = async (req, res, next) => {
         const contact = req.body.contact
         const description = req.body.description
         const openingHours = req.body.openingHours
+        const image = req.body.image
+        const portfolio = req.body.portfolio
 
         if(name) salon.name = name
         if(address) salon.address = address
@@ -143,6 +146,8 @@ exports.updateSalon = async (req, res, next) => {
         if(type) salon.type = type
         if(city) salon.city = city
         if(openingHours) salon.openingHours = openingHours
+        if(image) salon.image = image
+        if(portfolio) salon.portfolio = portfolio
 
         const updatedSalon = await salon.save()
         if(!updatedSalon) {
@@ -227,7 +232,8 @@ exports.getSalons = async (req, res, next) => {
                 name: salon.name,
                 address: salon.address,
                 type: salon.type,
-                city: salon.city
+                city: salon.city,
+                image: salon.image
             }
         })
 
@@ -272,6 +278,8 @@ exports.getSalonInfo = async (req, res, next) => {
             city: salon.city,
             type: salon.type,
             description: salon.description,
+            image: salon.image,
+            portfolio: salon.portfolio,
             openingHours: salon.openingHours.map(day => {
                 return {
                     name: day.name,
@@ -284,6 +292,7 @@ exports.getSalonInfo = async (req, res, next) => {
             crew: salon.crew.map(worker => {
                 return {
                     _id: worker._id.toString(),
+                    avatar: worker.imageUrl,
                     name: worker.name,
                 }
             })
@@ -329,6 +338,7 @@ exports.getSalonSchedule = async (req, res, next) => {
             worker.schedule.forEach(task => {
                 scheduleArray.push({
                     worker: worker.name,
+                    avatar: worker.imageUrl,
                     customer: task.customer.fullname,
                     phone: task.customer.phone,
                     start: task.start,
@@ -527,6 +537,7 @@ exports.addCrewMember = async (req, res, next) => {
         const salonId = req.params.id
 
         const name = req.body.name
+        const imageUrl = req.body.imageUrl
 
         if(!isAuth) {
             const error = new Error("user not authenticated");
@@ -549,6 +560,7 @@ exports.addCrewMember = async (req, res, next) => {
 
         const newCrewMember = {
             name: name,
+            imageUrl: imageUrl,
             schedule: []
         }
 
@@ -606,8 +618,10 @@ exports.updateCrewMember = async (req, res, next) => {
         }
 
         const name = req.body.name
+        const imageUrl = req.body.imageUrl
 
         if(name) crewMember.name = name
+        if(imageUrl) crewMember.imageUrl = imageUrl
 
         const updatedSalon = await salon.save()
         if(!updatedSalon) {

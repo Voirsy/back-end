@@ -2,6 +2,7 @@ require('dotenv').config()
 const cors = require('cors');
 
 const express = require('express')
+const fileMiddleware = require('express-multipart-file-parser')
 const mongoose = require('mongoose')
 
 const authRoutes = require('./routes/auth')
@@ -9,6 +10,7 @@ const profileRoutes = require('./routes/profile')
 const bussinessRoutes = require('./routes/bussiness')
 const salonsRoutes = require('./routes/salons')
 const dataRoutes = require('./routes/appData')
+const imageRoutes = require('./routes/images')
 
 const port = process.env.PORT || 8080
 const app = express()
@@ -20,8 +22,11 @@ app.use(express.urlencoded({
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
-app.use('/auth', authRoutes)
+app.use(fileMiddleware);
+
+app.use(imageRoutes)
 app.use(profileRoutes);
+app.use('/auth', authRoutes)
 app.use('/bussiness', bussinessRoutes)
 app.use('/salons', salonsRoutes)
 app.use('/data', dataRoutes)

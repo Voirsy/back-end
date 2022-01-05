@@ -34,6 +34,10 @@ const salonSchema = new Schema({
         type: String,
         required: false
     },
+    portfolio: [{
+        type: String,
+        required: false
+    }],
     city: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -119,6 +123,11 @@ const salonSchema = new Schema({
             name: {
                 type: String,
                 required: true
+            },
+            imageUrl: {
+                type: String,
+                required: false,
+                default: ''
             },
             schedule: [
                 {

@@ -75,6 +75,8 @@ exports.getSalon = async (req, res, next) => {
             address: salon.address,
             city: salon.city,
             type: salon.type,
+            image: salon.image,
+            portfolio: salon.portfolio,
             description: salon.description,
             openingHours: salon.openingHours.map(day => {
                 return {
@@ -88,6 +90,7 @@ exports.getSalon = async (req, res, next) => {
             crew: salon.crew.map(worker => {
                 return {
                     _id: worker._id.toString(),
+                    avatar: worker.imageUrl,
                     name: worker.name,
                 }
             }),
@@ -96,6 +99,7 @@ exports.getSalon = async (req, res, next) => {
                 return {
                     customer: {
                         _id: rating.customer._id.toString(),
+                        avatar: rating.customer.avatarUrl,
                         fullname: rating.customer.fullname
                     },
                     rating: rating.rating,
