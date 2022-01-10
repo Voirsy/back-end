@@ -12,5 +12,6 @@ router.post('/freehours', salonsController.freeHours)
 router.post('/reservation', isAuth, salonsController.confirmReservation)
 router.post('/rating', isAuth, salonsController.addRating)
 router.delete('/rating', isAuth, salonsController.deleteRating)
+router.post('/service', isAuth, salonsController.serviceDetails)
 
 module.exports = router
