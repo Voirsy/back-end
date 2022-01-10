@@ -32,7 +32,7 @@ app.use(profileRoutes);
 app.use("/auth", authRoutes);
 app.use("/bussiness", bussinessRoutes);
 app.use("/salons", salonsRoutes);
-app.use("/data", dataRoutes);
+app.use(dataRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
