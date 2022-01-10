@@ -16,7 +16,7 @@ exports.getSalons = async (req, res, next) => {
         const currentPage = req.body.currentPage || 1
 
         let filter = {}
-        if(city) filter.city = city
+        if(location) filter.city = location
         if(type) filter.type = { $all: type }
         if(search) filter.name = { $regex: search, $options: "i" }
 
