@@ -30,7 +30,7 @@ app.use(fileMiddleware);
 app.use(imageRoutes);
 app.use(profileRoutes);
 app.use("/auth", authRoutes);
-app.use("/bussiness", bussinessRoutes);
+app.use("/business", bussinessRoutes);
 app.use("/salons", salonsRoutes);
 app.use(dataRoutes);
 
