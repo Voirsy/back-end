@@ -25,7 +25,8 @@ exports.getUserData = async (req, res, next) => {
         role: loadedUser.role,
         language: loadedUser.language,
         currency: loadedUser.currency,
-        avatarUrl: loadedUser.avatarUrl
+        avatarUrl: loadedUser.avatarUrl,
+        favorites: loadedUser.favorites
       },
     });
     
