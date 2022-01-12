@@ -96,7 +96,7 @@ exports.getSalon = async (req, res, next) => {
       address: salon.address,
       city: salon.city.name,
       type: salon.type.map(category => { return category.name }),
-      image: salon.image,
+      imageUrl: salon.imageUrl,
       portfolio: salon.portfolio,
       description: salon.description,
       openingHours: salon.openingHours.map((day) => {
