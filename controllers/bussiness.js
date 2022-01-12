@@ -231,8 +231,8 @@ exports.getSalons = async (req, res, next) => {
                 _id: salon._id.toString(),
                 name: salon.name,
                 address: salon.address,
-                type: salon.type,
-                city: salon.city,
+                type: salon.type.map(category => { return category.name }),
+                city: salon.city.name,
                 image: salon.image
             }
         })
@@ -258,7 +258,7 @@ exports.getSalonInfo = async (req, res, next) => {
             throw error;
         }
 
-        const salon = await Salon.findOne({ _id: salonId })
+        const salon = await Salon.findOne({ _id: salonId }).populate('type city')
         if(!salon) {
             const error = new Error("can not find salon with selected id");
             error.statusCode = 404;
@@ -275,8 +275,8 @@ exports.getSalonInfo = async (req, res, next) => {
             _id: salon._id.toString(),
             name: salon.name,
             address: salon.address,
-            city: salon.city,
-            type: salon.type,
+            city: salon.city.name,
+            type: salon.type.map(category => { return category.name }),
             description: salon.description,
             image: salon.image,
             portfolio: salon.portfolio,

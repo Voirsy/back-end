@@ -83,7 +83,7 @@ exports.getSalon = async (req, res, next) => {
   try {
     const salonId = mongoose.Types.ObjectId(req.params.id);
 
-    const salon = await Salon.findOne(salonId).populate("ratings.customer");
+    const salon = await Salon.findOne(salonId).populate("ratings.customer city type");
     if (!salon) {
       const error = new Error("salon not found");
       error.statusCode = 404;
@@ -94,8 +94,8 @@ exports.getSalon = async (req, res, next) => {
       _id: salon._id.toString(),
       name: salon.name,
       address: salon.address,
-      city: salon.city,
-      type: salon.type,
+      city: salon.city.name,
+      type: salon.type.map(category => { return category.name }),
       image: salon.image,
       portfolio: salon.portfolio,
       description: salon.description,
