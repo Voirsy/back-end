@@ -32,12 +32,13 @@ exports.getSalons = async (req, res, next) => {
     const mappedSalons = await Promise.all(
       salons.map(async (salon) => {
         const quantityOfRating = salon.ratings.length;
+        console.log(salon)
         return {
           _id: salon._id.toString(),
           name: salon.name,
           address: salon.address,
           city: salon.city.name.charAt(0).toUpperCase() + salon.city.name.slice(1),
-          imageUrl: salon.image,
+          imageUrl: salon.imageUrl,
           popularity: salon.popularity,
           rating: salon.rating,
           quantityOfRating: quantityOfRating,

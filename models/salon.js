@@ -32,7 +32,7 @@ const salonSchema = new Schema({
       required: true,
     },
   },
-  image: {
+  imageUrl: {
     type: String,
     required: false,
   },
