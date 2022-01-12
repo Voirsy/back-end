@@ -106,7 +106,7 @@ exports.getSalon = async (req, res, next) => {
           close: day.close,
         };
       }),
-      contact: salon.contact,
+      phone: salon.contact.phone,
       services: salon.services,
       crew: salon.crew.map((worker) => {
         return {
