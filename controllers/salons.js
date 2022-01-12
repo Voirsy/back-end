@@ -116,15 +116,13 @@ exports.getSalon = async (req, res, next) => {
         };
       }),
       rating: salon.rating,
-      ratings: salon.ratings.map((rating) => {
+      reviews: salon.ratings.map((rating) => {
         return {
-          customer: {
-            _id: rating.customer._id.toString(),
-            avatar: rating.customer.avatarUrl,
-            fullname: rating.customer.fullname,
-          },
+          authorId: rating.customer._id.toString(),
+          name: rating.customer.fullname,
           rating: rating.rating,
-          opinion: rating.opinion,
+          description: rating.opinion,
+          avatarUrl: rating.customer.avatarUrl,
           date: rating.date,
         };
       }),
