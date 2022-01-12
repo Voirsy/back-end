@@ -11,15 +11,15 @@ const City = require("../models/city");
 
 exports.getSalons = async (req, res, next) => {
   try {
-    const city = req.body.city;
-    const type = req.body.type;
+    const city = req.body.location;
+    const type = req.body.salonType;
     const search = req.body.search;
     const limit = req.body.limitPerPage || 5;
     const currentPage = req.body.currentPage || 1;
 
     let filter = {};
     if (city) filter.city = city;
-    if (type) filter.type = { $all: type };
+    if (type) filter.type = { $in: type };
     if (search) filter.name = { $regex: search, $options: "i" };
 
     const salons = await Salon.find(filter).populate('type city');
