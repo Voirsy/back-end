@@ -22,7 +22,7 @@ exports.getSalons = async (req, res, next) => {
     if (type) filter.type = { $all: type };
     if (search) filter.name = { $regex: search, $options: "i" };
 
-    const salons = await Salon.find(filter);
+    const salons = await Salon.find(filter).populate('type city');
     if (!salons) {
       const error = new Error("searching salons error");
       error.statusCode = 400;
@@ -32,25 +32,18 @@ exports.getSalons = async (req, res, next) => {
     const mappedSalons = await Promise.all(
       salons.map(async (salon) => {
         const quantityOfRating = salon.ratings.length;
-        const categories = await Category.find();
-
-        const typeIds = salon.type.map((el) => el._id.toString());
-        let types = categories
-          .filter((category) => typeIds.includes(category._id.toString()))
-          .map((category) => category.name);
-
-        const [city] = await City.find({ _id: salon.city });
-
         return {
           _id: salon._id.toString(),
           name: salon.name,
           address: salon.address,
-          city: city.name.charAt(0).toUpperCase() + city.name.slice(1),
+          city: salon.city.name.charAt(0).toUpperCase() + salon.city.name.slice(1),
           imageUrl: salon.image,
           popularity: salon.popularity,
           rating: salon.rating,
           quantityOfRating: quantityOfRating,
-          type: types,
+          type: salon.type.map(category => {
+            return category.name
+          }),
         };
       })
     );
