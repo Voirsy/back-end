@@ -109,7 +109,7 @@ exports.updateProfile = async (req, res, next) => {
       user.fullname = fullname;
       user.birthdate = birthdate;
       user.phone = phone;
-      user.avatarUrl = avatarUrl;
+      if(avatarUrl) user.avatarUrl = avatarUrl;
   
       const updatedUser = await user.save()
       if (!updatedUser) {
@@ -124,7 +124,7 @@ exports.updateProfile = async (req, res, next) => {
             id: updatedUser._id.toString(),
             email: updatedUser.email,
             fullname: updatedUser.fullname,
-            birthday: updatedUser.birthdate,
+            birthdate: updatedUser.birthdate,
             phone: updatedUser.phone,
             role: updatedUser.role,
             language: updatedUser.language,
