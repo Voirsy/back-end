@@ -91,7 +91,7 @@ exports.updateProfile = async (req, res, next) => {
           throw error;
       }
 
-      const email = req.user.email;
+      const email = req.body.email;
       if(email && (user.email !== email)) {
           const alreadyExist = await User.findOne({ email: email });
           if (alreadyExist) {
@@ -111,9 +111,7 @@ exports.updateProfile = async (req, res, next) => {
       if (phone) user.phone = phone;
       if (avatarUrl) user.avatarUrl = avatarUrl;
   
-      
-  
-      const updatedUser = await user.save();
+      const updatedUser = await user.save()
       if (!updatedUser) {
         const error = new Error("updating user data failed");
         error.statusCode = 400;
@@ -122,7 +120,18 @@ exports.updateProfile = async (req, res, next) => {
   
       res.status(200).json({
         message: "user data updated",
-        user: updatedUser,
+        user: {
+            id: updatedUser._id.toString(),
+            email: updatedUser.email,
+            fullname: updatedUser.fullname,
+            birthdate: updatedUser.birthdate,
+            phone: updatedUser.phone,
+            role: updatedUser.role,
+            language: updatedUser.language,
+            currency: updatedUser.currency,
+            avatarUrl: updatedUser.avatarUrl,
+            favorites: updatedUser.favorites
+        },
       });
   } catch (e) {
     next(e);
