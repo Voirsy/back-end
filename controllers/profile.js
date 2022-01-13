@@ -164,7 +164,19 @@ exports.getFavorites = async (req, res, next) => {
           throw error;
       }
 
-      const user = await User.findOne({ _id: req.userId }).select('favorites -_id').populate('favorites', '_id name ')
+      const user = await User.findOne({ _id: req.userId }).select('favorites -_id')
+          .populate({
+              path: 'favorites',
+              select: '_id name imageUrl city type address owner rating',
+              populate: [{
+                  path: 'type',
+                  model: 'Category'
+              }, {
+                  path: 'city',
+                  model: 'City'
+              }]
+          })
+
       if(!user) {
           const error = new Error("user not found");
           error.statusCode = 404;
@@ -173,7 +185,15 @@ exports.getFavorites = async (req, res, next) => {
   
       res.status(200).json({
         message: "user favorites returned",
-        favorites: user.favorites,
+        favorites: user.favorites.map(favorite => ({
+            _id: favorite._id,
+            address: favorite.address,
+            city: favorite.city.name,
+            imageUrl: favorite.imageUrl,
+            name: favorite.name,
+            type: favorite.type.map(el => el.name),
+            rating: favorite.rating,
+        }))
       });
   } catch (e) {
     next(e);
