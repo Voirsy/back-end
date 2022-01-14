@@ -276,10 +276,7 @@ exports.getSalonInfo = async (req, res, next) => {
             name: salon.name,
             address: salon.address,
             city: salon.city.name,
-            type: salon.type.map(category => { return category.name }),
             description: salon.description,
-            image: salon.image,
-            portfolio: salon.portfolio,
             openingHours: salon.openingHours.map(day => {
                 return {
                     name: day.name,
@@ -287,12 +284,12 @@ exports.getSalonInfo = async (req, res, next) => {
                     close: day.close
                 }
             }),
-            contact: salon.contact,
+            phone: salon.contact.phone,
             services: salon.services,
             crew: salon.crew.map(worker => {
                 return {
                     _id: worker._id.toString(),
-                    avatar: worker.imageUrl,
+                    imageUrl: worker.imageUrl,
                     name: worker.name,
                 }
             })
