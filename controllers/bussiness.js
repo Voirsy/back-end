@@ -108,11 +108,13 @@ exports.updateSalon = async (req, res, next) => {
         }
 
         const city = req.body.city
+        if(city) {
         const findCity = await City.findOne({ _id: city })
-        if(!findCity) {
-            const error = new Error("can not find city with selected id");
-            error.statusCode = 404;
-            throw error;
+            if(!findCity) {
+                const error = new Error("can not find city with selected id");
+                error.statusCode = 404;
+                throw error;
+            }
         }
 
         const categories = await Category.find().select('_id')
@@ -121,14 +123,16 @@ exports.updateSalon = async (req, res, next) => {
         })
         
         const type = req.body.type
-        const checkType = await type.filter(id => {
-            return !mappedCategories.includes(id)
-        })
+        if(type) {
+            const checkType = await type.filter(id => {
+                return !mappedCategories.includes(id)
+            })
 
-        if(checkType.length > 0) {
-            const error = new Error("can not find category with selected id");
-            error.statusCode = 404;
-            throw error;
+            if(checkType.length > 0) {
+                const error = new Error("can not find category with selected id");
+                error.statusCode = 404;
+                throw error;
+            }
         }
 
         const name = req.body.name
