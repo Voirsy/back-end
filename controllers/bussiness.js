@@ -363,6 +363,40 @@ exports.getSalonSchedule = async (req, res, next) => {
   }
 };
 
+exports.getSalonPortfolio = async (req, res, next) => {
+  try {
+    const isAuth = req.isAuth;
+    const userId = req.userId;
+    const salonId = req.params.id;
+
+    if (!isAuth) {
+      const error = new Error("user not authenticated");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const salon = await Salon.findOne({ _id: salonId })
+    if (!salon) {
+      const error = new Error("can not find salon with selected id");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (salon.owner.toString() !== userId.toString()) {
+      const error = new Error("user is not owner of selected salon");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    res.status(200).json({
+      message: "salon portfolio returned",
+      portfolio: salon.portfolio,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 exports.addService = async (req, res, next) => {
   try {
     const isAuth = req.isAuth;

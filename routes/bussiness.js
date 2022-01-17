@@ -34,6 +34,12 @@ router.get(
   isBussiness,
   bussinessController.getSalonSchedule
 );
+router.get(
+  "/salon/:id/portfolio",
+  isAuth,
+  isBussiness,
+  bussinessController.getSalonPortfolio
+);
 //service
 router.post(
   "/salon/:id/service",
