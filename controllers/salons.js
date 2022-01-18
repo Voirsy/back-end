@@ -14,7 +14,7 @@ exports.getSalons = async (req, res, next) => {
     const city = req.body.location;
     const type = req.body.salonType;
     const search = req.body.search;
-    const limit = req.body.limitPerPage || 5;
+    const limit = req.body.limitPerPage || 1000;
     const currentPage = req.body.currentPage || 1;
 
     let filter = {};
