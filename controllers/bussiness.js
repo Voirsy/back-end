@@ -44,7 +44,7 @@ exports.createSalon = async (req, res, next) => {
     const address = req.body.address;
     const contact = req.body.contact;
     const portfolio = req.body.portfolio;
-    const image = req.body.image;
+    const imageUrl = req.body.imageUrl;
     const description = req.body.description;
     const services = req.body.services || [];
     const crew = req.body.crew || [];
@@ -55,7 +55,7 @@ exports.createSalon = async (req, res, next) => {
       name: name,
       address: address,
       contact: contact,
-      image: image,
+      imageUrl: imageUrl,
       portfolio: portfolio,
       description: description,
       type: type,
