@@ -84,7 +84,7 @@ exports.getSalon = async (req, res, next) => {
   try {
     const salonId = mongoose.Types.ObjectId(req.params.id);
 
-    const salon = await Salon.findOne(salonId).populate("ratings.customer city type");
+    const salon = await Salon.findOne({_id: salonId}).populate("ratings.customer city type");
     if (!salon) {
       const error = new Error("salon not found");
       error.statusCode = 404;
