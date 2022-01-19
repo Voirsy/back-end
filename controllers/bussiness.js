@@ -48,7 +48,20 @@ exports.createSalon = async (req, res, next) => {
     const description = req.body.description;
     const services = req.body.services || [];
     const crew = req.body.crew || [];
-    const openingHours = req.body.openingHours || [];
+    const openingHoursTemp = req.body.openingHours || [];
+
+    const openingHours = openingHoursTemp.map((item) => {
+      const keys = ["open", "close"];
+      let numberOfDigit;
+      keys.forEach((key) => {
+        numberOfDigit = item[key].split(":")[0].length;
+        if (numberOfDigit === 1) {
+          item[key] = `0${item[key]}`;
+        }
+      });
+
+      return item;
+    });
 
     const salon = new Salon({
       owner: owner,
@@ -375,7 +388,7 @@ exports.getSalonPortfolio = async (req, res, next) => {
       throw error;
     }
 
-    const salon = await Salon.findOne({ _id: salonId })
+    const salon = await Salon.findOne({ _id: salonId });
     if (!salon) {
       const error = new Error("can not find salon with selected id");
       error.statusCode = 404;
