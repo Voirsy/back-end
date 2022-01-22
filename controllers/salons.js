@@ -112,7 +112,7 @@ exports.getSalon = async (req, res, next) => {
       crew: salon.crew.map((worker) => {
         return {
           _id: worker._id.toString(),
-          avatar: worker.imageUrl,
+          imageUrl: worker.imageUrl,
           name: worker.name,
         };
       }),
