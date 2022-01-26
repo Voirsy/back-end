@@ -378,6 +378,22 @@ exports.addRating = async (req, res, next) => {
       throw error;
     }
 
+    const isUserCustomer = await salon.crew.filter(worker => {
+      const findCustomer = worker.schedule.filter(reservation => {
+        return reservation.customer.toString() === userId.toString()
+      })
+
+      return findCustomer.length > 0
+    })
+
+    console.log(isUserCustomer)
+
+    if (isUserCustomer.length === 0) {
+      const error = new Error("user can not add opinion if he is not a customer");
+      error.statusCode = 409;
+      throw error;
+    }
+
     const alreadyRated = await salon.ratings.filter((rating) => {
       return rating.customer.toString() === userId;
     });
