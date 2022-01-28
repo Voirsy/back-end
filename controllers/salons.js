@@ -386,8 +386,6 @@ exports.addRating = async (req, res, next) => {
       return findCustomer.length > 0
     })
 
-    console.log(isUserCustomer)
-
     if (isUserCustomer.length === 0) {
       const error = new Error("user can not add opinion if he is not a customer");
       error.statusCode = 409;

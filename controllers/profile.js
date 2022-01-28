@@ -211,21 +211,22 @@ exports.getFavorites = async (req, res, next) => {
 
 exports.addToFavorites = async (req, res, next) => {
   try {
-    const salonId = req.body.salonId
-
+    
     if(!req.isAuth) {
-        const error = new Error("user not authenticated");
-        error.statusCode = 401;
-        throw error;
+      const error = new Error("user not authenticated");
+      error.statusCode = 401;
+      throw error;
     }
-
+    
     const user = await User.findOne({ _id: req.userId })
     if(!user) {
-        const error = new Error("user not found");
-        error.statusCode = 404;
-        throw error;
+      const error = new Error("user not found");
+      error.statusCode = 404;
+      throw error;
     }
-
+    
+    const salonId = req.body.salonId
+    
     const salon = await Salon.findOne({ _id: salonId })
     if(!salon) {
         const error = new Error("salon not found");
